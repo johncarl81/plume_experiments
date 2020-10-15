@@ -3,10 +3,7 @@
 #include <random>
 #include "Point.h"
 #include "Ellipse.h"
-#include "PointStrategy.h"
-#include "ChordStrategy.h"
-#include "SpokeStrategy.h"
-#include "JohnSpokeStrategy.h"
+#include "SearchStrategyFactory.h"
 
 
 using namespace std;
@@ -74,58 +71,17 @@ void evaluateConvergence(string name, vector<SearchStrategy *> strategies, long 
 
 }
 
-void evaluatePoint(Ellipse area, double areaRadius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[], int evaluations_size) {
-
+void evaluate(string name, SearchStrategy *(*strategyFactory)(double, const Ellipse &, const Ellipse &), Ellipse area,
+              double radius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[5],
+              int evaluations_size) {
     vector<SearchStrategy*> strategies;
     strategies.reserve(trials);
     for(int t = 0; t < trials; t++) {
-        strategies.push_back(new PointStrategy(areaRadius, area, region));
+        strategies.push_back(strategyFactory(radius, area, region));
     }
 
-    evaluateConvergence("Points", strategies, limit, trials, region.size(), thresholdWithin, trialsWithin, evaluations_size);
-
-    for (SearchStrategy* strategy : strategies) {
-        delete strategy;
-    }
-
-}
-
-void evaluateChord(Ellipse area, double areaRadius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[], int evaluations_size) {
-    vector<SearchStrategy*> strategies;
-    strategies.reserve(trials);
-    for(int t = 0; t < trials; t++) {
-        strategies.push_back(new ChordStrategy(areaRadius, area, region));
-    }
-
-    evaluateConvergence("Chords", strategies, limit, trials, region.size(), thresholdWithin, trialsWithin, evaluations_size);
-
-    for (SearchStrategy* strategy : strategies) {
-        delete strategy;
-    }
-}
-
-void evaluateSpoke(Ellipse area, double radius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[5], int evaluations_size) {
-    vector<SearchStrategy*> strategies;
-    strategies.reserve(trials);
-    for(int t = 0; t < trials; t++) {
-        strategies.push_back(new SpokeStrategy(radius, area, region));
-    }
-
-    evaluateConvergence("Spokes by length", strategies, limit, trials, region.size(), thresholdWithin, trialsWithin, evaluations_size);
-
-    for (SearchStrategy* strategy : strategies) {
-        delete strategy;
-    }
-}
-
-void evaluateJohnSpoke(Ellipse area, double radius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[5], int evaluations_size) {
-    vector<SearchStrategy*> strategies;
-    strategies.reserve(trials);
-    for(int t = 0; t < trials; t++) {
-        strategies.push_back(new JohnSpokeStrategy(radius, area, region));
-    }
-
-    evaluateConvergence("Spokes by samples", strategies, limit, trials, region.size(), thresholdWithin, trialsWithin, evaluations_size);
+    evaluateConvergence(name, strategies, limit, trials, region.size(), thresholdWithin, trialsWithin,
+                        evaluations_size);
 
     for (SearchStrategy* strategy : strategies) {
         delete strategy;
@@ -138,24 +94,25 @@ void evaluate(Ellipse area, double areaRadius, int trials, int limit, Ellipse re
     int evaluations_size = 4;
     cout << "Target size " << region.size() << endl;
 
-    evaluatePoint(area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
-
-    evaluateChord(area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
-
-    evaluateSpoke(area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
-
-    evaluateJohnSpoke(area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
+    evaluate("Point", SearchStrategyFactory::pointStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations,
+             evaluations_size);
+    evaluate("Chords", SearchStrategyFactory::chordStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations,
+             evaluations_size);
+    evaluate("Spokes by Length", SearchStrategyFactory::spokeStrategy, area, areaRadius, trials, limit, region, 0.9,
+             evaluations, evaluations_size);
+    evaluate("Spokes by samples", SearchStrategyFactory::johnStrategy, area, areaRadius, trials, limit, region, 0.9,
+             evaluations, evaluations_size);
 }
 
 int main() {
-    cout << "Running Plume Area Simulation..." << endl;
+    cout << "Running Plume Area Simulation Convergence..." << endl;
     time_t start = time(NULL);
 
     double R = 8.0;
-    Ellipse area = Ellipse(Point(0, 0), R, R);
     int trials = 100;
-    int limit = 1000000;
+    int limit = 100000;
 
+    Ellipse area = Ellipse(Point(0, 0), R, R);
     Ellipse region = Ellipse(Point(0, 0), R, R / 1.2);
     evaluate(area, R, trials, limit, region);
 

@@ -4,25 +4,29 @@ JohnSpokeStrategy::JohnSpokeStrategy(double areaRadius, const Ellipse &area, con
                                                                                               area(area),
                                                                                               region(region) {}
 
-void JohnSpokeStrategy::executeUntil(long distance) {
-    while(length < distance) {
-        double angle = 2.0 * M_PI * RandomUtil::uniform_random();
+void JohnSpokeStrategy::execute() {
+    double angle = RandomUtil::random_angle();
 
-        Point end = Point(cos(angle) * areaRadius, sin(angle) * areaRadius);
-        Point center = Point(0, 0);
-        Line line = Line::buildByPointAndAngle(center, angle);
+    Point end = Point(cos(angle) * areaRadius, sin(angle) * areaRadius);
+    Point center = Point(0, 0);
+    Line line = Line::buildByPointAndAngle(center, angle);
 
-        LineSegment spoke = LineSegment(line, center, end);
+    LineSegment spoke = LineSegment(line, center, end);
 
-        LineSegment spokeintersection = region.segmentIntersections(spoke);
+    LineSegment spokeintersection = region.segmentIntersections(spoke);
 
-        withinSpokeLength += spokeintersection.length() * spokeintersection.length() * M_PI;
-        length += spoke.length() * spoke.length() * M_PI;
+    withinSpokeLength += spokeintersection.length() * spokeintersection.length() * M_PI;
+    distance += spoke.length() * spoke.length() * M_PI;
 
-        spokes++;
-    }
+    spokes++;
 }
 
+
+
 double JohnSpokeStrategy::getAreaEstimate() {
-    return area.size() * withinSpokeLength / length;
+    return area.size() * withinSpokeLength / distance;
+}
+
+double JohnSpokeStrategy::getDistance() {
+    return distance;
 }

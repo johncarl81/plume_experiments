@@ -6,8 +6,11 @@
 class SearchStrategy {
 
 public:
+    virtual void execute() = 0;
 
-    virtual void executeUntil(long distance) = 0;
+    virtual double getDistance() = 0;
+
+    void executeUntil(double distance);
 
     virtual double getAreaEstimate() = 0;
 };

@@ -5,25 +5,27 @@ SpokeStrategy::SpokeStrategy(double areaRadius, const Ellipse &area, const Ellip
                                                                                               area(area),
                                                                                               region(region) {}
 
-void SpokeStrategy::executeUntil(long distance) {
-    while(length < distance) {
-        double angle = 2.0 * M_PI * RandomUtil::uniform_random();
+void SpokeStrategy::execute() {
+    double angle = 2.0 * M_PI * RandomUtil::uniform_random();
 
-        Point end = Point(cos(angle) * areaRadius, sin(angle) * areaRadius);
-        Point center = Point(0, 0);
-        Line line = Line::buildByPointAndAngle(center, angle);
+    Point end = Point(cos(angle) * areaRadius, sin(angle) * areaRadius);
+    Point center = Point(0, 0);
+    Line line = Line::buildByPointAndAngle(center, angle);
 
-        LineSegment spoke = LineSegment(line, center, end);
+    LineSegment spoke = LineSegment(line, center, end);
 
-        LineSegment spokeintersection = region.segmentIntersections(spoke);
+    LineSegment spokeintersection = region.segmentIntersections(spoke);
 
-        withinSpokeLength += spokeintersection.length();
-        length += 2 * spoke.length();
+    withinSpokeLength += spokeintersection.length();
+    distance += 2 * spoke.length();
 
-        spokes++;
-    }
+    spokes++;
 }
 
 double SpokeStrategy::getAreaEstimate() {
     return M_PI * pow(withinSpokeLength / spokes, 2);
+}
+
+double SpokeStrategy::getDistance() {
+    return distance;
 }

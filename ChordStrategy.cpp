@@ -4,16 +4,14 @@ ChordStrategy::ChordStrategy(double areaRadius, const Ellipse &area, const Ellip
                                                                                               region(region),
                                                                                               areaRadius(areaRadius) {}
 
-void ChordStrategy::executeUntil(long distance) {
-    while(length < distance) {
-        LineSegment chord = startEndCircle();
-        LineSegment regionChord = region.intersections(chord.getLine());
+void ChordStrategy::execute() {
+    LineSegment chord = startEndCircle();
+    LineSegment regionChord = region.intersections(chord.getLine());
 
-        length += chord.length();
-        totalRegionChordLength += regionChord.length();
+    distance += chord.length();
+    totalRegionChordLength += regionChord.length();
 
-        samples++;
-    }
+    samples++;
 }
 
 double ChordStrategy::getAreaEstimate() {
@@ -61,4 +59,8 @@ LineSegment ChordStrategy::midpoint() {
 Point ChordStrategy::randomPoint() {
     return Point(RandomUtil::uniform_random(-areaRadius, areaRadius),
             RandomUtil::uniform_random(-areaRadius, areaRadius));
+}
+
+double ChordStrategy::getDistance() {
+    return distance;
 }

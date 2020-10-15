@@ -16,7 +16,9 @@ public:
 
     double getAreaEstimate() override;
 
-    void executeUntil(long distance) override;
+    void execute() override;
+
+    double getDistance() override;
 
 private:
     double areaRadius;
@@ -26,8 +28,10 @@ private:
     long hits = 0;
     long samples = 0;
     Point previous = Point(0, 0);
-    double length = 0;
+    double distance = 0;
     bool first = true;
+
+    Point randomPoint();
 };
 
 
