@@ -25,8 +25,8 @@ private:
     Ellipse area;
     Ellipse region;
 
-    long hits = 0;
-    long samples = 0;
+    int hits = 0;
+    int samples = 0;
     Point previous = Point(0, 0);
     double distance = 0;
     bool first = true;

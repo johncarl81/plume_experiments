@@ -7,7 +7,9 @@
 
 using namespace std;
 
-int simulate(double radiusA, double radiusS,
+typedef pair<bool, double> HitLength;
+
+HitLength simulate(double radiusA, double radiusS,
              SearchStrategy *(*strategyFactory)(double, const Ellipse &, const Ellipse &)) {
     int trials = 10000;
 
@@ -23,34 +25,41 @@ int simulate(double radiusA, double radiusS,
 
     double estimate = strategy->getAreaEstimate();
     double actual = M_PI * radiusA * radiusA;
+    double distance = strategy->getDistance();
 
     delete strategy;
+    HitLength hitLength;
+    hitLength.second = distance;
+    hitLength.first = abs(actual / estimate - 1) <= 0.05;
 
-    if (abs(actual / estimate - 1) > 0.05) {
-        return 0;
-    }
-    return 1;
+    return hitLength;
 }
 
 void countHits(const string &name, SearchStrategy *(*strategyFactory)(double, const Ellipse &, const Ellipse &)) {
     int cases = 100;
-    int maxr = 10000;
+    int maxr = 10;
 
     int hits = 0;
+    double distance = 0;
     for (int i = 1; i < cases; i++) {
         double r1, r2;
         r2 = RandomUtil::uniform_random() * maxr;
         r1 = RandomUtil::uniform_random() * r2;
-        hits += simulate(r1, r2, strategyFactory);
+        HitLength simulationHitLength = simulate(r1, r2, strategyFactory);
+        if (simulationHitLength.first) {
+            hits++;
+            distance += simulationHitLength.second;
+        }
     }
-    cout << name << " Hits: " << hits << "/" << cases << "=" << (1.0 * hits / cases) << endl;
+    cout << name << " Hits: " << hits << "/" << cases << "=" << (1.0 * hits / cases) << " average hit distance: "
+         << (distance / hits) << endl;
 }
 
 int main() {
-    countHits("Point", SearchStrategyFactory::pointStrategy);
-    countHits("Chord", SearchStrategyFactory::chordStrategy);
-    countHits("Spoke", SearchStrategyFactory::spokeStrategy);
-    countHits("John", SearchStrategyFactory::johnStrategy);
+    countHits("Point by samples", SearchStrategyFactory::pointStrategy);
+    countHits("Chords by length", SearchStrategyFactory::chordStrategy);
+    countHits("Spokes by length", SearchStrategyFactory::spokeStrategy);
+    countHits("Spokes by samples", SearchStrategyFactory::johnStrategy);
 
     return 0;
 }

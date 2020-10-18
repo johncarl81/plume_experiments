@@ -28,7 +28,7 @@ private:
 
     double distance = 0;
     double totalRegionChordLength = 0;
-    long samples = 0;
+    int samples = 0;
 
     Point randomPoint();
 };

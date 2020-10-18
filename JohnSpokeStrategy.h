@@ -23,8 +23,9 @@ private:
     Ellipse area, region;
 
     double withinSpokeLength = 0;
+    double spokeArea = 0;
     double distance = 0;
-    long spokes = 0;
+    int spokes = 0;
 };
 
 

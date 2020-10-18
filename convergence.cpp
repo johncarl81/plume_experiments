@@ -8,7 +8,17 @@
 
 using namespace std;
 
-void evaluateConvergence(string name, vector<SearchStrategy *> strategies, long limit, long trials, double regionSize, double thresholdWithin, double trialsWithin[], int evaluations_size) {
+double averageDistance(vector<SearchStrategy *> strategies) {
+    double distance_sum = 0;
+
+    for (SearchStrategy *strategy : strategies) {
+        distance_sum += strategy->getDistance();
+    }
+
+    return distance_sum / strategies.size();
+}
+
+void evaluateConvergence(const string name, vector<SearchStrategy *> strategies, const int limit, const int trials, const double regionSize, const double thresholdWithin, const double trialsWithin[], const int evaluations_size) {
     double trialsWithinResults[evaluations_size];
     for(int e = 0; e < evaluations_size; e++) {
         trialsWithinResults[e] = -1;
@@ -45,7 +55,7 @@ void evaluateConvergence(string name, vector<SearchStrategy *> strategies, long 
         for(int e = 0; e < evaluations_size; e++) {
 //            cout << trialsWithin[e] << " " << (trialsPassed[e] ? trialsWithinResults[e] : 1.0 * trialsWithinCount[e] / trials) << " ";
             if(!trialsPassed[e] && trialsWithinCount[e] >= thresholdWithin * trials) {
-                trialsWithinResults[e] = i;
+                trialsWithinResults[e] = averageDistance(strategies);
                 trialsPassed[e] = true;
             }
 
@@ -71,9 +81,7 @@ void evaluateConvergence(string name, vector<SearchStrategy *> strategies, long 
 
 }
 
-void evaluate(string name, SearchStrategy *(*strategyFactory)(double, const Ellipse &, const Ellipse &), Ellipse area,
-              double radius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[5],
-              int evaluations_size) {
+void evaluate(const string name, SearchStrategy *(*strategyFactory)(double, const Ellipse &, const Ellipse &), Ellipse area, double radius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[5], int evaluations_size) {
     vector<SearchStrategy*> strategies;
     strategies.reserve(trials);
     for(int t = 0; t < trials; t++) {
@@ -90,33 +98,29 @@ void evaluate(string name, SearchStrategy *(*strategyFactory)(double, const Elli
 
 void evaluate(Ellipse area, double areaRadius, int trials, int limit, Ellipse region) {
 
-    double evaluations[] = {0.5, 0.1, 0.05, 0.01};
-    int evaluations_size = 4;
+    double evaluations[] = {0.5, 0.1, 0.05, 0.01, 0.001};
+    int evaluations_size = 5;
     cout << "Target size " << region.size() << endl;
 
-    evaluate("Point", SearchStrategyFactory::pointStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations,
-             evaluations_size);
-    evaluate("Chords", SearchStrategyFactory::chordStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations,
-             evaluations_size);
-    evaluate("Spokes by Length", SearchStrategyFactory::spokeStrategy, area, areaRadius, trials, limit, region, 0.9,
-             evaluations, evaluations_size);
-    evaluate("Spokes by samples", SearchStrategyFactory::johnStrategy, area, areaRadius, trials, limit, region, 0.9,
-             evaluations, evaluations_size);
+    evaluate("Point by samples", SearchStrategyFactory::pointStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
+    evaluate("Chords by length", SearchStrategyFactory::chordStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
+    evaluate("Spokes by length", SearchStrategyFactory::spokeStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
+    evaluate("Spokes by samples", SearchStrategyFactory::johnStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
 }
 
 int main() {
     cout << "Running Plume Area Simulation Convergence..." << endl;
-    time_t start = time(NULL);
+    time_t start = time(nullptr);
 
     double R = 8.0;
     int trials = 100;
-    int limit = 100000;
+    int limit = 10000000;
 
     Ellipse area = Ellipse(Point(0, 0), R, R);
     Ellipse region = Ellipse(Point(0, 0), R, R / 1.2);
     evaluate(area, R, trials, limit, region);
 
-    cout << "Simulation took: " << (time(NULL) - start) << "s" << endl;
+    cout << "Simulation took: " << (time(nullptr) - start) << "s" << endl;
 
     return 0;
 }

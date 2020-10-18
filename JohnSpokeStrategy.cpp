@@ -16,7 +16,9 @@ void JohnSpokeStrategy::execute() {
     LineSegment spokeintersection = region.segmentIntersections(spoke);
 
     withinSpokeLength += spokeintersection.length() * spokeintersection.length() * M_PI;
-    distance += spoke.length() * spoke.length() * M_PI;
+    spokeArea += spoke.length() * spoke.length() * M_PI;
+
+    distance += 2 * spoke.length();
 
     spokes++;
 }
@@ -24,7 +26,7 @@ void JohnSpokeStrategy::execute() {
 
 
 double JohnSpokeStrategy::getAreaEstimate() {
-    return area.size() * withinSpokeLength / distance;
+    return area.size() * withinSpokeLength / spokeArea;
 }
 
 double JohnSpokeStrategy::getDistance() {

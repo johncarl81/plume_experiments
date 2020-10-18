@@ -23,7 +23,7 @@ void SpokeStrategy::execute() {
 }
 
 double SpokeStrategy::getAreaEstimate() {
-    return M_PI * pow(withinSpokeLength / spokes, 2);
+    return 1.004159225 * M_PI * pow(withinSpokeLength / spokes, 2);
 }
 
 double SpokeStrategy::getDistance() {

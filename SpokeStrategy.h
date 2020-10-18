@@ -23,7 +23,7 @@ private:
 
     double withinSpokeLength = 0;
     double distance = 0;
-    long spokes = 0;
+    int spokes = 0;
 };
 
 
