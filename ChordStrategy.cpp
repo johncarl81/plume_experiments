@@ -5,7 +5,7 @@ ChordStrategy::ChordStrategy(double areaRadius, const Ellipse &area, const Ellip
                                                                                               areaRadius(areaRadius) {}
 
 void ChordStrategy::execute() {
-    LineSegment chord = startEndCircle();
+    LineSegment chord = randomMidpointRadius();
     LineSegment regionChord = region.intersections(chord.getLine());
 
     distance += chord.length();
@@ -16,7 +16,7 @@ void ChordStrategy::execute() {
 
 double ChordStrategy::getAreaEstimate() {
     // This is strange, why do we need a constant here?
-    return 0.843805869 * M_PI * areaRadius * (totalRegionChordLength / samples);
+    return 0.63660926 * M_PI * areaRadius * (totalRegionChordLength / samples);
 }
 
 LineSegment ChordStrategy::startEndCircle() {
@@ -52,6 +52,17 @@ LineSegment ChordStrategy::midpoint() {
     double angle = RandomUtil::random_angle();
 
     Line line = Line::buildByPointAndAngle(midpoint, angle);
+
+    return region.intersections(line);
+}
+
+LineSegment ChordStrategy::randomMidpointRadius() {
+    double angle = RandomUtil::random_angle();
+    double dist = areaRadius *  RandomUtil::uniform_random();
+
+    Point point = Point(cos(angle) * dist, sin(angle) * dist);
+
+    Line line = Line::buildByPointAndAngle(point, angle + (M_PI_2));
 
     return region.intersections(line);
 }

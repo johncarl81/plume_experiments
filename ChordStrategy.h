@@ -25,6 +25,7 @@ private:
     LineSegment startEndCircle();
     LineSegment randomAngle();
     LineSegment midpoint();
+    LineSegment randomMidpointRadius();
 
     double distance = 0;
     double totalRegionChordLength = 0;

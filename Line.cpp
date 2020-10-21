@@ -4,14 +4,14 @@ Line::Line(double m, double b) : m(m), b(b) {}
 
 Line Line::buildByPoints(Point &start, Point &end) {
     double m = (end.getY() - start.getY()) / (end.getX() - start.getX());
-    double b = (m * start.getX()) + start.getY();
+    double b = start.getY() - (m * start.getX());
 
     return Line(m, b);
 }
 
 Line Line::buildByPointAndAngle(Point &start, double angle) {
     double m = tan(angle);
-    double b = (m * start.getX()) + start.getY();
+    double b = start.getY() - (m * start.getX());
 
     return Line(m, b);
 }
