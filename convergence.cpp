@@ -10,18 +10,37 @@ using namespace std;
 
 double averageDistance(vector<SearchStrategy *> strategies) {
     double distance_sum = 0;
-
     for (SearchStrategy *strategy : strategies) {
         distance_sum += strategy->getDistance();
     }
-
     return distance_sum / strategies.size();
+}
+
+double averageArea(vector<SearchStrategy *> strategies) {
+    double distance_sum = 0;
+    for (SearchStrategy *strategy : strategies) {
+        distance_sum += strategy->getAreaEstimate();
+    }
+    return distance_sum / strategies.size();
+}
+
+double areaVarience(vector<SearchStrategy *> strategies) {
+    double mean = averageArea(strategies);
+    double squaredDifferenceSum = 0;
+    for (SearchStrategy *strategy : strategies) {
+        squaredDifferenceSum += pow(strategy->getAreaEstimate() - mean, 2);
+    }
+    return squaredDifferenceSum / strategies.size();
 }
 
 void evaluateConvergence(const string name, vector<SearchStrategy *> strategies, const int limit, const int trials, const double regionSize, const double thresholdWithin, const double trialsWithin[], const int evaluations_size) {
     double trialsWithinResults[evaluations_size];
+    double areaMean[evaluations_size];
+    double areaVariance[evaluations_size];
     for(int e = 0; e < evaluations_size; e++) {
         trialsWithinResults[e] = -1;
+        areaMean[e] = 0;
+        areaVariance[e] = 0;
     }
     bool trialsPassed[evaluations_size];
     for(int e = 0; e < evaluations_size; e++) {
@@ -39,11 +58,9 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
             double estimate = strategy->getAreaEstimate();
 
 //            cout << estimate << " vs " << regionSize << endl;
-
-            double relativeDifference = abs(estimate - regionSize);
             for(int e = 0; e < evaluations_size; e++) {
                 if(!trialsPassed[e]) {
-                    if (relativeDifference < regionSize * trialsWithin[e]) {
+                    if (abs(regionSize / estimate - 1) <= trialsWithin[e]) {
                         trialsWithinCount[e]++;
                     }
                 }
@@ -56,6 +73,8 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
 //            cout << trialsWithin[e] << " " << (trialsPassed[e] ? trialsWithinResults[e] : 1.0 * trialsWithinCount[e] / trials) << " ";
             if(!trialsPassed[e] && trialsWithinCount[e] >= thresholdWithin * trials) {
                 trialsWithinResults[e] = averageDistance(strategies);
+                areaMean[e] = averageArea(strategies);
+                areaVariance[e] = areaVarience(strategies);
                 trialsPassed[e] = true;
             }
 
@@ -64,21 +83,26 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
 //        cout << endl;
 
     }
-
-    cout << name << ":\t@" << thresholdWithin << ": ";
+    cout << name << ":" << endl;
+    cout << " Convergence to " << thresholdWithin << ":\t";
     for(int e = 0; e < evaluations_size; e++) {
         cout << trialsWithin[e] << ": " << trialsWithinResults[e] << ",\t";
     }
     cout << endl;
 
-    double estimateSum = 0;
-
-    for (SearchStrategy* strategy : strategies) {
-        estimateSum += strategy->getAreaEstimate();
+    cout << " means:  \t\t\t\t";
+    for(int e = 0; e < evaluations_size; e++) {
+        cout << trialsWithin[e] << ": " << areaMean[e] << ",\t";
     }
-    cout << "Average: " << (estimateSum / strategies.size()) << endl;
+    cout << endl;
 
+    cout << " variance:\t\t\t\t";
+    for(int e = 0; e < evaluations_size; e++) {
+        cout << trialsWithin[e] << ": " << areaVariance[e] << ",\t";
+    }
+    cout << endl;
 
+    cout << "Final mean: " << averageArea(strategies) << endl;
 }
 
 void evaluate(const string name, SearchStrategy *(*strategyFactory)(double, const Ellipse &, const Ellipse &), Ellipse area, double radius, int trials, int limit, Ellipse region, double thresholdWithin, double trialsWithin[5], int evaluations_size) {
@@ -98,8 +122,10 @@ void evaluate(const string name, SearchStrategy *(*strategyFactory)(double, cons
 
 void evaluate(Ellipse area, double areaRadius, int trials, int limit, Ellipse region) {
 
-    double evaluations[] = {0.5, 0.1, 0.05, 0.01, 0.001};
-    int evaluations_size = 5;
+//    double evaluations[] = {0.5, 0.1, 0.05, 0.01, 0.001};
+//    int evaluations_size = 5;
+    double evaluations[] = {0.5, 0.1, 0.05, 0.01};
+    int evaluations_size = 4;
     cout << "Target size " << region.size() << endl;
 
     evaluate("Point by samples", SearchStrategyFactory::pointStrategy, area, areaRadius, trials, limit, region, 0.9, evaluations, evaluations_size);
@@ -112,13 +138,28 @@ int main() {
     cout << "Running Plume Area Simulation Convergence..." << endl;
     time_t start = time(nullptr);
 
-    double R = 8.0;
+    double R = 3.0;
     int trials = 100;
     int limit = 10000000;
 
     Ellipse area = Ellipse(Point(0, 0), R, R);
-    Ellipse region = Ellipse(Point(0, 0), R, R / 1.2);
-    evaluate(area, R, trials, limit, region);
+
+    double ratios[] = {1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2};
+
+    for(int i = 0; i < 11; i++) {
+        cout << "Ellipse: (0,0) (R,R/" << ratios[i] << ")" << endl;
+        Ellipse region = Ellipse(Point(0, 0), R, R / ratios[i]);
+        evaluate(area, R, trials, limit, region);
+    }
+
+    double offsets[] = {0, 0.1, 0.2, 0.3, 0.4, 0.5};
+    double radius_ratio = 1.2;
+
+    for(int i = 0; i < 6; i++) {
+        cout << "Ellipse: (0," << offsets[i] << ") (R/" << radius_ratio << ",R/" << radius_ratio << ")" << endl;
+        Ellipse region = Ellipse(Point(0, offsets[i]), R/radius_ratio, R/radius_ratio);
+        evaluate(area, R, trials, limit, region);
+    }
 
     cout << "Simulation took: " << (time(nullptr) - start) << "s" << endl;
 
