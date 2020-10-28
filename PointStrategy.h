@@ -14,16 +14,20 @@ class PointStrategy: public SearchStrategy  {
 public:
     PointStrategy(double areaRadius, const Ellipse &area, const Ellipse &region);
 
-    double getAreaEstimate() override;
+    double getAreaEstimate(double distance) override;
 
     void execute() override;
 
-    double getDistance() override;
+    double getMaxDistance() override;
 
 private:
     double areaRadius;
     Ellipse area;
     Ellipse region;
+
+    vector<Point> history;
+    vector<double> distances;
+    vector<double> estimate;
 
     int hits = 0;
     int samples = 0;

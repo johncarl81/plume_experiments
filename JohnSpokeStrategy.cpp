@@ -18,17 +18,29 @@ void JohnSpokeStrategy::execute() {
     withinSpokeLength += spokeintersection.length() * spokeintersection.length() * M_PI;
     spokeArea += spoke.length() * spoke.length() * M_PI;
 
-    distance += 2 * spoke.length();
+    distance += 2 * areaRadius;
 
     spokes++;
+
+    history.push_back(spoke);
+    distances.push_back(distance);
+    estimate.push_back(area.size() * withinSpokeLength / spokeArea);
 }
 
-
-
-double JohnSpokeStrategy::getAreaEstimate() {
-    return area.size() * withinSpokeLength / spokeArea;
+double JohnSpokeStrategy::getAreaEstimate(double distance) {
+    for(int i = 0; i < distances.size(); i++) {
+        if(distances.at(i) == distance) {
+            return estimate.at(i);
+        }
+        if(distances.at(i) > distance) {
+            if(i > 0) {
+                return estimate.at(i - 1);
+            }
+        }
+    }
+    return -1;
 }
 
-double JohnSpokeStrategy::getDistance() {
+double JohnSpokeStrategy::getMaxDistance() {
     return distance;
 }

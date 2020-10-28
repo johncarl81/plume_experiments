@@ -14,13 +14,17 @@ public:
 
     void execute() override;
 
-    double getDistance() override;
+    double getMaxDistance() override;
 
-    double getAreaEstimate() override;
+    double getAreaEstimate(double distance) override;
 
 private:
     double areaRadius;
     Ellipse area, region;
+
+    vector<LineSegment> history;
+    vector<double> distances;
+    vector<double> estimate;
 
     double withinSpokeLength = 0;
     double spokeArea = 0;

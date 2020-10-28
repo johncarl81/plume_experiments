@@ -1,11 +1,10 @@
-//
-// Created by john on 10/15/20.
-//
-
 #include "SearchStrategy.h"
 
 void SearchStrategy::executeUntil(double distance) {
-    while (getDistance() < distance) {
-        execute();
+    for (; getMaxDistance() < distance; distanceIteration++) {
+        int trials = pow(2, distanceIteration);
+        for (int i = 0; i < trials; i++) {
+            execute();
+        }
     }
 }

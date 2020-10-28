@@ -12,11 +12,24 @@ void ChordStrategy::execute() {
     totalRegionChordLength += regionChord.length();
 
     samples++;
+
+    history.push_back(chord);
+    distances.push_back(distance);
+    estimate.push_back(0.63660926 * M_PI * areaRadius * (totalRegionChordLength / samples));
 }
 
-double ChordStrategy::getAreaEstimate() {
-    // This is strange, why do we need a constant here?
-    return 0.63660926 * M_PI * areaRadius * (totalRegionChordLength / samples);
+double ChordStrategy::getAreaEstimate(double distance) {
+    for(int i = 0; i < distances.size(); i++) {
+        if(distances.at(i) == distance) {
+            return estimate.at(i);
+        }
+        if(distances.at(i) > distance) {
+            if(i > 0) {
+                return estimate.at(i - 1);
+            }
+        }
+    }
+    return -1;
 }
 
 LineSegment ChordStrategy::startEndCircle() {
@@ -72,6 +85,6 @@ Point ChordStrategy::randomPoint() {
             RandomUtil::uniform_random(-areaRadius, areaRadius));
 }
 
-double ChordStrategy::getDistance() {
+double ChordStrategy::getMaxDistance() {
     return distance;
 }

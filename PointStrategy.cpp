@@ -19,12 +19,28 @@ void PointStrategy::execute() {
     } else {
         first = false;
     }
+
+
     previous = point;
     samples++;
+
+    history.push_back(point);
+    distances.push_back(distance);
+    estimate.push_back(1.0 * area.size() * hits / samples);
 }
 
-double PointStrategy::getAreaEstimate() {
-    return 1.0 * area.size() * hits / samples;
+double PointStrategy::getAreaEstimate(double distance) {
+    for(int i = 0; i < distances.size(); i++) {
+         if(distances.at(i) == distance) {
+            return estimate.at(i);
+        }
+        if(distances.at(i) > distance) {
+            if(i > 0) {
+                return estimate.at(i - 1);
+            }
+        }
+    }
+    return -1;
 }
 
 Point PointStrategy::randomPoint() {
@@ -32,6 +48,6 @@ Point PointStrategy::randomPoint() {
                  RandomUtil::uniform_random(-areaRadius, areaRadius));
 }
 
-double PointStrategy::getDistance() {
+double PointStrategy::getMaxDistance() {
     return distance;
 }

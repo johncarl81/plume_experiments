@@ -23,9 +23,9 @@ HitLength simulate(double radiusA, double radiusS,
         strategy->execute();
     }
 
-    double estimate = strategy->getAreaEstimate();
+    double estimate = strategy->getAreaEstimate(trials);
     double actual = M_PI * radiusA * radiusA;
-    double distance = strategy->getDistance();
+    double distance = strategy->getMaxDistance();
 
     delete strategy;
     HitLength hitLength;

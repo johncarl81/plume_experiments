@@ -14,13 +14,17 @@ public:
 
     void execute() override;
 
-    double getDistance() override;
+    double getMaxDistance() override;
 
-    double getAreaEstimate() override;
+    double getAreaEstimate(double distance) override;
 
 private:
     Ellipse area, region;
     double areaRadius;
+
+    vector<LineSegment> history;
+    vector<double> distances;
+    vector<double> estimate;
 
     LineSegment startEndCircle();
     LineSegment randomAngle();
