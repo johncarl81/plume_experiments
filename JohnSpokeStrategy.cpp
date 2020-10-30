@@ -23,24 +23,14 @@ void JohnSpokeStrategy::execute() {
     spokes++;
 
     history.push_back(spoke);
-    distances.push_back(distance);
-    estimate.push_back(area.size() * withinSpokeLength / spokeArea);
+    distanceEstimate.emplace_back(distance, area.size() * withinSpokeLength / spokeArea);
 }
 
-double JohnSpokeStrategy::getAreaEstimate(double distance) {
-    for(int i = 0; i < distances.size(); i++) {
-        if(distances.at(i) == distance) {
-            return estimate.at(i);
-        }
-        if(distances.at(i) > distance) {
-            if(i > 0) {
-                return estimate.at(i - 1);
-            }
-        }
-    }
-    return -1;
+vector<DistanceEstimate>* JohnSpokeStrategy::getDistanceEstimate() {
+    return &distanceEstimate;
 }
 
 double JohnSpokeStrategy::getMaxDistance() {
     return distance;
 }
+

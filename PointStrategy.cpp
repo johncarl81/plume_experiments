@@ -25,22 +25,7 @@ void PointStrategy::execute() {
     samples++;
 
     history.push_back(point);
-    distances.push_back(distance);
-    estimate.push_back(1.0 * area.size() * hits / samples);
-}
-
-double PointStrategy::getAreaEstimate(double distance) {
-    for(int i = 0; i < distances.size(); i++) {
-         if(distances.at(i) == distance) {
-            return estimate.at(i);
-        }
-        if(distances.at(i) > distance) {
-            if(i > 0) {
-                return estimate.at(i - 1);
-            }
-        }
-    }
-    return -1;
+    distanceEstimate.emplace_back(distance, 1.0 * area.size() * hits / samples);
 }
 
 Point PointStrategy::randomPoint() {
@@ -51,3 +36,9 @@ Point PointStrategy::randomPoint() {
 double PointStrategy::getMaxDistance() {
     return distance;
 }
+
+vector<DistanceEstimate>* PointStrategy::getDistanceEstimate() {
+    return &distanceEstimate;
+}
+
+

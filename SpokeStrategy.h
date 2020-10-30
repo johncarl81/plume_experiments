@@ -15,15 +15,14 @@ public:
 
     double getMaxDistance() override;
 
-    double getAreaEstimate(double distance) override;
+    vector<DistanceEstimate>* getDistanceEstimate() override;
 
 private:
     double areaRadius;
     Ellipse area, region;
 
     vector<LineSegment> history;
-    vector<double> distances;
-    vector<double> estimate;
+    vector<DistanceEstimate> distanceEstimate;
 
     double withinSpokeLength = 0;
     double distance = 0;

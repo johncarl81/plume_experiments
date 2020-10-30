@@ -1,11 +1,26 @@
-
 #ifndef PLUME_EXPERIMENTS_SEARCHSTRATEGY_H
 #define PLUME_EXPERIMENTS_SEARCHSTRATEGY_H
 
 #include <cmath>
+#include <vector>
 #include <iostream>
 
 using namespace std;
+
+class DistanceEstimate {
+public:
+    DistanceEstimate(double distance, double estimate) : distance(distance), estimate(estimate) {};
+
+    bool operator<(const DistanceEstimate &first) const {
+        return distance < first.distance;
+    }
+
+    bool operator>(const DistanceEstimate &first) const {
+        return distance > first.distance;
+    }
+
+    double distance, estimate;
+};
 
 class SearchStrategy {
 
@@ -16,7 +31,9 @@ public:
 
     void executeUntil(double distance);
 
-    virtual double getAreaEstimate(double distance) = 0;
+    double getAreaEstimate(double distance);
+
+    virtual vector<DistanceEstimate>* getDistanceEstimate() = 0;
 
 private:
     int distanceIteration = 0;

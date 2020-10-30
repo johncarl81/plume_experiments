@@ -14,32 +14,22 @@ void SpokeStrategy::execute() {
 
     LineSegment spoke = LineSegment(line, center, end);
 
-    LineSegment spokeintersection = region.segmentIntersections(spoke);
+    LineSegment spokeIntersection = region.segmentIntersections(spoke);
 
-    withinSpokeLength += spokeintersection.length();
+    withinSpokeLength += spokeIntersection.length();
     distance += 2 * areaRadius;
 
     spokes++;
 
     history.push_back(spoke);
-    distances.push_back(distance);
-    estimate.push_back(1.004159225 * M_PI * pow(withinSpokeLength / spokes, 2));
+    distanceEstimate.emplace_back(distance, 1.004159225 * M_PI * pow(withinSpokeLength / spokes, 2));
 }
 
-double SpokeStrategy::getAreaEstimate(double distance) {
-    for(int i = 0; i < distances.size(); i++) {
-        if(distances.at(i) == distance) {
-            return estimate.at(i);
-        }
-        if(distances.at(i) > distance) {
-            if(i > 0) {
-                return estimate.at(i - 1);
-            }
-        }
-    }
-    return -1;
+vector<DistanceEstimate>* SpokeStrategy::getDistanceEstimate() {
+    return &distanceEstimate;
 }
 
 double SpokeStrategy::getMaxDistance() {
     return distance;
 }
+

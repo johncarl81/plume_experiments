@@ -32,6 +32,20 @@ double areaVarience(vector<SearchStrategy *> strategies, int distance) {
     return squaredDifferenceSum / strategies.size();
 }
 
+void coutArray(double data[], const int size) {
+    bool first = true;
+    cout << "[";
+    for(int i = 0; i < size; i++) {
+        if(first) {
+            first = false;
+        } else {
+            cout << ", ";
+        }
+        cout << data[i];
+    }
+    cout << "]";
+}
+
 void evaluateConvergence(const string name, vector<SearchStrategy *> strategies, const int limit, const int trials, const double regionSize, const double thresholdWithin, const double trialsWithin[], const int evaluations_size) {
     double trialsWithinResults[evaluations_size];
     double areaMean[evaluations_size];
@@ -82,24 +96,20 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
 //        cout << endl;
 
     }
-    cout << name << ":" << endl;
-    cout << " Convergence to " << thresholdWithin << ":\t";
-    for(int e = 0; e < evaluations_size; e++) {
-        cout << trialsWithin[e] << ": " << trialsWithinResults[e] << ",\t";
-    }
-    cout << endl;
+    cout << "          \"" << name << "\":" << endl;
+    cout << "            {" << endl;
+    cout << "              \"Convergence to " << thresholdWithin << "\": ";
+    coutArray(trialsWithinResults, evaluations_size);
+    cout << "," << endl;
 
-    cout << " means:  \t\t\t\t";
-    for(int e = 0; e < evaluations_size; e++) {
-        cout << trialsWithin[e] << ": " << areaMean[e] << ",\t";
-    }
-    cout << endl;
+    cout << "              \"means\": ";
+    coutArray(areaMean, evaluations_size);
+    cout << "," << endl;
 
-    cout << " variance:\t\t\t\t";
-    for(int e = 0; e < evaluations_size; e++) {
-        cout << trialsWithin[e] << ": " << areaVariance[e] << ",\t";
-    }
+    cout << "              \"variance\": ";
+    coutArray(areaVariance, evaluations_size);
     cout << endl;
+    cout << "            }";
 
 //    cout << "Final mean: " << averageArea(strategies) << endl;
 }
@@ -123,45 +133,86 @@ void evaluate(Ellipse area, double areaRadius, int trials, int limit, Ellipse re
 
 //    double evaluations[] = {0.5, 0.1, 0.05, 0.01, 0.001};
 //    int evaluations_size = 5;
-    double evaluations[] = {0.5, 0.1, 0.05, 0.01, 0.001, 0.0001};
-    int evaluations_size = 4;
+//    double evaluations[] = {0.5, 0.1, 0.05, 0.01, 0.001, 0.0001};
+    int evaluations_size = 10;
+    double evaluations[evaluations_size];
+    for(int i = 1; i <= evaluations_size; i++) {
+        evaluations[i-1] = pow(0.5, i);
+    }
     double thresholdWithin = 0.9;
-    cout << "Target size " << region.size() << endl;
+    cout << "        {" << endl;
+    cout << "          \"Target size\":" << region.size() << "," << endl;
+    cout << "          \"evaluations\": ";
+    coutArray(evaluations, evaluations_size);
+    cout << "," << endl;
 
     evaluate("Point by samples", SearchStrategyFactory::pointStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
+    cout << "," << endl;
     evaluate("Chords by length", SearchStrategyFactory::chordStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
-    evaluate("Spokes by length", SearchStrategyFactory::spokeStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
+    cout << "," << endl;
+//    evaluate("Spokes by length", SearchStrategyFactory::spokeStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
+//    cout << "," << endl;
     evaluate("Spokes by samples", SearchStrategyFactory::johnStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
+    cout << endl;
+    cout << "        }";
 }
 
 int main() {
-    cout << "Running Plume Area Simulation Convergence..." << endl;
     time_t start = time(nullptr);
+
+    cout.precision(10);
 
     double R = 3.0;
     int trials = 30;
-    int limit = 10000000;
+    int limit = 10000;
 
     Ellipse area = Ellipse(Point(0, 0), R, R);
 
     double ratios[] = {1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2};
 
+    cout << "{" << endl;
+
+    cout << "  \"squash\":"  << endl;
+    cout << "    {" << endl;
+    bool first = true;
     for(double ratio : ratios) {
-        cout << "Ellipse: (0,0) (R,R/" << ratio << ")" << endl;
+        if(first) {
+            first = false;
+        } else {
+            cout << "," << endl;
+        }
+        cout << "      \"Ellipse: (0,0) (R,R/" << ratio << ")\": " << endl;
         Ellipse region = Ellipse(Point(0, 0), R, R / ratio);
         evaluate(area, R, trials, limit, region);
     }
+    cout << endl;
+
+    cout << "    }," << endl;
 
     double offsets[] = {0, 0.1, 0.2, 0.3, 0.4, 0.5};
     double radius_ratio = 1.2;
 
+    cout << "  \"translate\":"  << endl;
+    cout << "    {" << endl;
+    first = true;
     for(double offset : offsets) {
-        cout << "Ellipse: (0," << offset << ") (R/" << radius_ratio << ",R/" << radius_ratio << ")" << endl;
+        if(first) {
+            first = false;
+        } else {
+            cout << "," << endl;
+        }
+        cout << "      \"Ellipse: (0," << offset << ") (R/" << radius_ratio << ",R/" << radius_ratio << ")\": " << endl;
         Ellipse region = Ellipse(Point(0, offset), R/radius_ratio, R/radius_ratio);
         evaluate(area, R, trials, limit, region);
     }
+    cout << endl;
+    cout << "    }," << endl;
 
-    cout << "Simulation took: " << (time(nullptr) - start) << "s" << endl;
+    cout << "  \"Simulation took\": " << (time(nullptr) - start) << endl;
+
+    cout << "}" << endl;
+
+
 
     return 0;
 }
