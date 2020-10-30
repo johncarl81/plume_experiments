@@ -25,6 +25,11 @@ public:
 class SearchStrategy {
 
 public:
+
+    SearchStrategy() = default;
+
+    virtual ~SearchStrategy() = default;
+
     virtual void execute() = 0;
 
     virtual double getMaxDistance() = 0;
@@ -36,6 +41,8 @@ public:
     virtual vector<DistanceEstimate>* getDistanceEstimate() = 0;
 
 private:
+    std::vector<DistanceEstimate>::iterator lower(std::vector<DistanceEstimate>::iterator first, std::vector<DistanceEstimate>::iterator last, double value);
+
     int distanceIteration = 0;
 };
 

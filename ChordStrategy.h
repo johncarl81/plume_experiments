@@ -12,6 +12,8 @@ class ChordStrategy: public SearchStrategy {
 public:
     ChordStrategy(double areaRadius, const Ellipse &area, const Ellipse &region);
 
+    ~ChordStrategy() override = default;
+
     void execute() override;
 
     double getMaxDistance() override;

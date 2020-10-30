@@ -11,6 +11,8 @@ class SpokeStrategy : public SearchStrategy {
 public:
     SpokeStrategy(double areaRadius, const Ellipse &area, const Ellipse &region);
 
+    ~SpokeStrategy() override = default;
+
     void execute() override;
 
     double getMaxDistance() override;

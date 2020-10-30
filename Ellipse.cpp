@@ -1,6 +1,6 @@
 #include "Ellipse.h"
 
-Ellipse::Ellipse(const Point &center, double x_radius, double y_radius) :
+Ellipse::Ellipse(const Point& center, double x_radius, double y_radius) :
 center(center), radius_x(x_radius), radius_y(y_radius) {}
 
 bool Ellipse::inside(Point vector) {

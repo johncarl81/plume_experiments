@@ -12,6 +12,8 @@ class JohnSpokeStrategy : public SearchStrategy {
 public:
     JohnSpokeStrategy(double areaRadius, const Ellipse &area, const Ellipse &region);
 
+    ~JohnSpokeStrategy() override = default;
+
     void execute() override;
 
     double getMaxDistance() override;

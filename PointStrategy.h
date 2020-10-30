@@ -14,6 +14,8 @@ class PointStrategy: public SearchStrategy  {
 public:
     PointStrategy(double areaRadius, const Ellipse &area, const Ellipse &region);
 
+    ~PointStrategy() override = default;
+
     void execute() override;
 
     double getMaxDistance() override;
