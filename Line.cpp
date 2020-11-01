@@ -3,7 +3,7 @@
 Line::Line(double m, double b) : m(m), b(b) {}
 
 Line Line::buildByPoints(Point &start, Point &end) {
-    double m = (end.getY() - start.getY()) / (end.getX() - start.getX());
+    double m = (end.getY() - start.getY()) / (end.getX() - start.getX() + 1e-9); //divide by zero case solved by 1e-9
     double b = start.getY() - (m * start.getX());
 
     return Line(m, b);
