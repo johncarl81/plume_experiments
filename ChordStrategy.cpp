@@ -14,7 +14,7 @@ void ChordStrategy::execute() {
     samples++;
 
     history.push_back(chord);
-    distanceEstimate.emplace_back(distance, 0.63660926 * M_PI * areaRadius * (totalRegionChordLength / samples));
+    distanceEstimate.emplace_back(distance, 2 * areaRadius * (totalRegionChordLength / samples));
 }
 
 vector<DistanceEstimate>* ChordStrategy::getDistanceEstimate() {

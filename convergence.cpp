@@ -7,14 +7,6 @@
 
 using namespace std;
 
-double averageDistance(vector<SearchStrategy *> strategies, int distance) {
-    double distance_sum = 0;
-    for (SearchStrategy *strategy : strategies) {
-        distance_sum += strategy->getMaxDistance();
-    }
-    return distance_sum / strategies.size();
-}
-
 double averageArea(vector<SearchStrategy *> strategies, int distance) {
     double distance_sum = 0;
     for (SearchStrategy *strategy : strategies) {
@@ -96,20 +88,20 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
 //        cout << endl;
 
     }
-    cout << "          \"" << name << "\":" << endl;
-    cout << "            {" << endl;
-    cout << "              \"Convergence to " << thresholdWithin << "\": ";
+    cout << "            \"" << name << "\":" << endl;
+    cout << "              {" << endl;
+    cout << "                \"Convergence to " << thresholdWithin << "\": ";
     coutArray(trialsWithinResults, evaluations_size);
     cout << "," << endl;
 
-    cout << "              \"means\": ";
+    cout << "                \"means\": ";
     coutArray(areaMean, evaluations_size);
     cout << "," << endl;
 
-    cout << "              \"variance\": ";
+    cout << "                \"variance\": ";
     coutArray(areaVariance, evaluations_size);
     cout << endl;
-    cout << "            }";
+    cout << "              }";
 
 //    cout << "Final mean: " << averageArea(strategies) << endl;
 }
@@ -145,7 +137,7 @@ void evaluate(Ellipse area, double areaRadius, int trials, int limit, Ellipse re
     cout << "          \"evaluations\": ";
     coutArray(evaluations, evaluations_size);
     cout << "," << endl;
-
+    cout << "          \"techniques\": {" << endl;
     evaluate("Point by samples", SearchStrategyFactory::pointStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
     cout << "," << endl;
     evaluate("Chords by length", SearchStrategyFactory::chordStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
@@ -154,6 +146,7 @@ void evaluate(Ellipse area, double areaRadius, int trials, int limit, Ellipse re
 //    cout << "," << endl;
     evaluate("Spokes by samples", SearchStrategyFactory::johnStrategy, area, areaRadius, trials, limit, region, thresholdWithin, evaluations, evaluations_size);
     cout << endl;
+    cout << "          }" << endl;
     cout << "        }";
 }
 
