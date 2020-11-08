@@ -17,6 +17,18 @@ public:
 
     LineSegment intersections(Line line);
 
+    Point getCenter() {
+        return center;
+    }
+
+    double getXRadius() {
+        return radius_x;
+    }
+
+    double getYRadius() {
+        return radius_y;
+    }
+
 private:
     Point center;
     double radius_x, radius_y;

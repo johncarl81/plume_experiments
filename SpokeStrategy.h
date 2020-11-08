@@ -19,6 +19,8 @@ public:
 
     vector<DistanceEstimate>* getDistanceEstimate() override;
 
+    void optimize() override {};
+
 private:
     double areaRadius;
     Ellipse area, region;

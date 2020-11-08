@@ -134,6 +134,7 @@ void evaluate(Ellipse area, double areaRadius, int trials, int limit, Ellipse re
     double thresholdWithin = 0.9;
     cout << "        {" << endl;
     cout << "          \"Target size\":" << region.size() << "," << endl;
+    cout << "          \"ellipse\": {\"center\": [" << region.getCenter().getX() << ", " << region.getCenter().getY() << "], \"rx\": " << region.getXRadius() << ", \"ry\": " << region.getYRadius() << "}, " << endl;
     cout << "          \"evaluations\": ";
     coutArray(evaluations, evaluations_size);
     cout << "," << endl;
@@ -157,11 +158,11 @@ int main() {
 
     double R = 3.0;
     int trials = 30;
-    int limit = 10000;
+    int limit = 10000000;
 
     Ellipse area = Ellipse(Point(0, 0), R, R);
 
-    double ratios[] = {1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2};
+    double ratios[] = {1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3};
 
     cout << "{" << endl;
 
