@@ -6,6 +6,8 @@ void SearchStrategy::executeUntil(double distance) {
         for (int i = 0; i < trials; i++) {
             execute();
         }
+
+        optimize();
     }
 }
 

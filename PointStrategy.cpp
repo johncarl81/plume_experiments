@@ -41,4 +41,8 @@ vector<DistanceEstimate>* PointStrategy::getDistanceEstimate() {
     return &distanceEstimate;
 }
 
+void PointStrategy::optimize() {
+    TSP::minimize(history);
+}
+
 

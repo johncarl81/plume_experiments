@@ -40,6 +40,8 @@ public:
 
     virtual vector<DistanceEstimate>* getDistanceEstimate() = 0;
 
+    virtual void optimize() = 0;
+
 private:
     std::vector<DistanceEstimate>::iterator lower(std::vector<DistanceEstimate>::iterator first, std::vector<DistanceEstimate>::iterator last, double value);
 

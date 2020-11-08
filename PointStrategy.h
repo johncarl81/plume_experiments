@@ -6,6 +6,7 @@
 #include "Ellipse.h"
 #include "SearchStrategy.h"
 #include "RandomUtil.h"
+#include "TSP.h"
 
 using namespace std;
 
@@ -21,6 +22,8 @@ public:
     double getMaxDistance() override;
 
     vector<DistanceEstimate>* getDistanceEstimate() override;
+
+    void optimize() override;
 
 private:
     double areaRadius;
