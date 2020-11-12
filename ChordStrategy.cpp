@@ -78,3 +78,7 @@ double ChordStrategy::getMaxDistance() {
     return distance;
 }
 
+int ChordStrategy::size() {
+    return history.size();
+}
+

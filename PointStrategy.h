@@ -15,7 +15,7 @@ class PointStrategy: public SearchStrategy  {
 public:
     PointStrategy(double areaRadius, const Ellipse &area, const Ellipse &region);
 
-    ~PointStrategy() override = default;
+    ~PointStrategy() override;
 
     void execute() override;
 
@@ -25,12 +25,14 @@ public:
 
     void optimize() override;
 
+    int size() override;
+
 private:
     double areaRadius;
     Ellipse area;
     Ellipse region;
 
-    vector<Point> history;
+    vector<Point*> history;
     vector<DistanceEstimate> distanceEstimate;
 
     int hits = 0;

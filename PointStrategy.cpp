@@ -24,7 +24,7 @@ void PointStrategy::execute() {
     previous = point;
     samples++;
 
-    history.push_back(point);
+    history.push_back(new Point(point.getX(), point.getY()));
     distanceEstimate.emplace_back(distance, 1.0 * area.size() * hits / samples);
 }
 
@@ -42,7 +42,38 @@ vector<DistanceEstimate>* PointStrategy::getDistanceEstimate() {
 }
 
 void PointStrategy::optimize() {
-    TSP::minimize(history);
+    TSP::optimize(history);
+
+    // Recalculate distances.
+    distance = 0;
+    hits = 0;
+    samples = 0;
+    bool firstLoop = true;
+    for(int i = 0; i < history.size(); i++) {
+        if(firstLoop) {
+            firstLoop = false;
+        } else {
+            distance += ((*history[i]) - (*history[i-1])).length();
+        }
+
+        if (region.inside(*history[i])) {
+            hits++;
+        }
+        samples++;
+
+        distanceEstimate.at(i).distance = distance;
+        distanceEstimate.at(i).estimate = 1.0 * area.size() * hits / samples;
+    }
+}
+
+int PointStrategy::size() {
+    return history.size();
+}
+
+PointStrategy::~PointStrategy() {
+    for(Point* point : history) {
+        delete point;
+    }
 }
 
 

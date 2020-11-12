@@ -24,7 +24,8 @@ double areaVarience(vector<SearchStrategy *> strategies, int distance) {
     return squaredDifferenceSum / strategies.size();
 }
 
-void coutArray(double data[], const int size) {
+template <class T>
+void coutArray(T data[], const int size) {
     bool first = true;
     cout << "[";
     for(int i = 0; i < size; i++) {
@@ -88,6 +89,13 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
 //        cout << endl;
 
     }
+
+    int endingSizes[strategies.size()];
+    for(int i = 0; i < strategies.size(); i++) {
+        endingSizes[i] = strategies[i]->size();
+    }
+
+
     cout << "            \"" << name << "\":" << endl;
     cout << "              {" << endl;
     cout << "                \"Convergence to " << thresholdWithin << "\": ";
@@ -101,6 +109,12 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
     cout << "                \"variance\": ";
     coutArray(areaVariance, evaluations_size);
     cout << endl;
+
+    cout << "                \"endingsizes\": ";
+    coutArray(endingSizes, strategies.size());
+    cout << endl;
+
+
     cout << "              }";
 
 //    cout << "Final mean: " << averageArea(strategies) << endl;

@@ -21,6 +21,8 @@ public:
 
     void optimize() override {};
 
+    int size() override;
+
 private:
     double areaRadius;
     Ellipse area, region;

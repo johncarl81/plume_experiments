@@ -33,3 +33,7 @@ double JohnSpokeStrategy::getMaxDistance() {
     return distance;
 }
 
+int JohnSpokeStrategy::size() {
+    return history.size();
+}
+

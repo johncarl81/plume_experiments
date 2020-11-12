@@ -1,91 +1,90 @@
 #include "TSP.h"
 
-vector<Point*> TSP::dft(Point* root, map<Point *, set<Point *>> map) {
+void TSP::dft(vector<Point*> &result, Point* root, map<Point *, set<Point *>> &map) {
 
-    vector<Point*> result;
-    if(root != nullptr) {
-        result.push_back(root);
-        for(Point* point : map[root]) {
-            vector<Point*> dftresult = dft(point, map);
+    result.clear();
 
-            for(Point* dftpoint : dftresult) {
-                result.push_back(dftpoint);
+    stack<Point*> pointStack;
+    pointStack.push(root);
+    while(!pointStack.empty()) {
+        Point* currentRoot = pointStack.top();
+        pointStack.pop();
+
+        result.push_back(currentRoot);
+
+        if(map.count(currentRoot) > 0) {
+            for (Point *point : map[currentRoot]) {
+                pointStack.push(point);
             }
         }
     }
-    return result;
 }
 
-void TSP::minimize(vector<Point> &history) {
+void TSP::optimize(vector<Point*> &history) {
 
-//    for(Point point : history) {
-//        cout << "Point (" << point.getX() << "," << point.getY() << ")" << endl;
-//    }
-
-    double distance = 0;
-    for(int i = 0; i < history.size() - 1; i++) {
-        distance += ((history[i]) - (history[i + 1])).length();
+    if(history.size() < 2) {
+        return;
     }
 
-    cout << "Starting distance: " << distance << endl;
-
+    boost::heap::fibonacci_heap<Edge> queue;
     set<Point*> included;
-    included.insert(&history.front());
     map<Point*, set<Point*>> minimumSpanningTree;
+    map<Point*, boost::heap::fibonacci_heap<Edge>::handle_type> heapHandles;
 
-    cout << "Building tree..." << endl;
     KDTree nearestTree;
-    for(Point &point : history) {
-        nearestTree.insert(&point);
+    Point* first = history.back();
+    history.pop_back();
+    for(Point* point : history) {
+        nearestTree.insert(point);
     }
-    nearestTree.remove(&history.front());
+    included.insert(first);
+    nearestTree.remove(first);
+    pushEdge(queue, first, nearestTree, heapHandles);
 
-    cout << "Finding nearest..." << endl;
-    while(included.size() < history.size()) {
-        cout << "Size: " << included.size() << endl;
-        Edge next = findMinimumEdge(included, nearestTree);
+    while(!queue.empty()) {
+        Edge smallestEdge = queue.top();
+        queue.pop();
 
-        if(minimumSpanningTree.count(next.first) == 0) {
-            minimumSpanningTree[next.first] = set<Point*>();
+        // smallestEdge.first is always included
+        if(included.count(smallestEdge.second) == 0) {
+
+            // Add the edge to the MST
+            if(minimumSpanningTree.count(smallestEdge.first) == 0) {
+                minimumSpanningTree[smallestEdge.first] = set<Point*>();
+            }
+            minimumSpanningTree[smallestEdge.first].insert(smallestEdge.second);
+            included.insert(smallestEdge.second);
+
+            // And remove the destination from the searchable set
+            nearestTree.remove(smallestEdge.second);
+
+            pushEdge(queue, smallestEdge.first, nearestTree, heapHandles);
+            pushEdge(queue, smallestEdge.second, nearestTree, heapHandles);
+        } else {
+            PointDistance nearest = nearestTree.nearest(smallestEdge.first);
+            if(nearest.second != INFINITY) {
+                queue.push(Edge(smallestEdge.first, nearest));
+            }
         }
-        minimumSpanningTree[next.first].insert(next.second);
-
-        included.insert(next.second);
-
-        nearestTree.remove(next.second);
     }
 
-    cout << "Running dft..." << endl;
-    vector<Point*> result = dft(&history.front(), minimumSpanningTree);
-
-    cout << "size: " << result.size() << endl;
-    distance = 0;
-    for(int i = 0; i < result.size() - 1; i++) {
-        distance += ((*result[i]) - (*result[i + 1])).length();
-    }
-//
-//    for(Point* point : result) {
-//        cout << "Point (" << point->getX() << "," << point->getY() << ")" << endl;
-//    }
-
-    cout << "Ending distance: " << distance << endl;
-
+    dft(history, first, minimumSpanningTree);
 }
 
-Edge TSP::findMinimumEdge(set<Point*> &included, KDTree& nearestTree) {
+void TSP::pushEdge(boost::heap::fibonacci_heap<Edge>& queue, Point* point, KDTree& nearestTree, map<Point *, boost::heap::fibonacci_heap<Edge>::handle_type>& map) {
 
-    PointDistance minimum(nullptr, INFINITY);
-    Point* from = nullptr;
-
-    for(Point* point : included) {
-
-        PointDistance nearby = nearestTree.nearest(point);
-
-        if(nearby.second < minimum.second) {
-            minimum = nearby;
-            from = point;
+    PointDistance nearest = nearestTree.nearest(point);
+    // Only add the new point if it is connected to the current tree with a longer edge.
+    if(map.count(nearest.first) > 0) {
+        boost::heap::fibonacci_heap<Edge>::handle_type handle = map.at(nearest.first);
+        if(handle.node_->value.getDistance() > nearest.second) {
+            // Replace the key if it exists.
+            boost::heap::fibonacci_heap<Edge>::const_reference ref(Edge(point, nearest));
+            queue.decrease(handle, ref);
         }
+    } else {
+        // Add a new entry because it doesn't exist.
+        boost::heap::fibonacci_heap<Edge>::handle_type handle = queue.push(Edge(point, nearest));
+        map[nearest.first] = handle;
     }
-
-    return Edge(from, minimum.first);
 }

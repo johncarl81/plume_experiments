@@ -32,3 +32,7 @@ vector<DistanceEstimate>* SpokeStrategy::getDistanceEstimate() {
 double SpokeStrategy::getMaxDistance() {
     return distance;
 }
+
+int SpokeStrategy::size() {
+    return history.size();
+}

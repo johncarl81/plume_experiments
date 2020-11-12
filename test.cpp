@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <queue>
 #include "Point.h"
 #include "SearchStrategyFactory.h"
 
@@ -46,22 +47,71 @@ void testKDTree() {
     }
 }
 
+double distance(vector<Point*> &points) {
+    double distance = 0;
+
+    bool firstLoop = true;
+    for(int i = 0; i < points.size(); i++) {
+        if(firstLoop) {
+            firstLoop = false;
+        } else {
+            distance += ((*points[i]) - (*points[i-1])).length();
+        }
+    }
+
+    return distance;
+}
+
 void testTSP() {
 
-    vector<Point> points;
+    vector<Point*> empty;
 
-    points.push_back(Point(12, 30));
-    points.push_back(Point(44, 15));
-    points.push_back(Point(32, 28));
-    points.push_back(Point(95, 80));
-    points.push_back(Point(0, 60));
-    points.push_back(Point(55, 70));
-    points.push_back(Point(15, 70));
+    TSP::optimize(empty);
 
-    TSP::minimize(points);
+    vector<Point*> one;
+    one.push_back(new Point(0, 0));
+
+    TSP::optimize(one);
+
+    vector<Point*> points;
+
+    points.push_back(new Point(12, 30));
+    points.push_back(new Point(44, 15));
+    points.push_back(new Point(32, 28));
+    points.push_back(new Point(95, 80));
+    points.push_back(new Point(0, 60));
+    points.push_back(new Point(55, 70));
+    points.push_back(new Point(15, 70));
+
+    TSP::optimize(points);
+
+    points.clear();
+
+    int size = 262143;
+
+    for(int i = 0; i < size; i++) {
+        points.push_back(new Point(RandomUtil::uniform_random(0, 6), RandomUtil::uniform_random(0, 6)));
+    }
+
+//    for(Point* point : points) {
+//        cout << point->getX() << "," << point->getY() << endl;
+//    }
+
+    cout << "Distance " << distance(points) << endl;
+
+    TSP::optimize(points);
+
+    cout << "Optimized: " << endl;
+
+//    for(Point* point : points) {
+//        cout << point->getX() << "," << point->getY() << endl;
+//    }
+
+    cout << "Distance " << distance(points) << endl;
 }
 
 int main() {
+
     testKDTree();
     testTSP();
 
