@@ -15,7 +15,7 @@ double averageArea(vector<SearchStrategy *> strategies, int distance) {
     return distance_sum / strategies.size();
 }
 
-double areaVarience(vector<SearchStrategy *> strategies, int distance) {
+double areaVariance(vector<SearchStrategy *> strategies, int distance) {
     double mean = averageArea(strategies, distance);
     double squaredDifferenceSum = 0;
     for (SearchStrategy *strategy : strategies) {
@@ -42,11 +42,11 @@ void coutArray(T data[], const int size) {
 void evaluateConvergence(const string name, vector<SearchStrategy *> strategies, const int limit, const int trials, const double regionSize, const double thresholdWithin, const double trialsWithin[], const int evaluations_size) {
     double trialsWithinResults[evaluations_size];
     double areaMean[evaluations_size];
-    double areaVariance[evaluations_size];
+    double areaVar[evaluations_size];
     for(int e = 0; e < evaluations_size; e++) {
         trialsWithinResults[e] = -1;
         areaMean[e] = 0;
-        areaVariance[e] = 0;
+        areaVar[e] = 0;
     }
     bool trialsPassed[evaluations_size];
     for(int e = 0; e < evaluations_size; e++) {
@@ -80,7 +80,7 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
             if(!trialsPassed[e] && trialsWithinCount[e] >= thresholdWithin * trials) {
                 trialsWithinResults[e] = i;
                 areaMean[e] = averageArea(strategies, i);
-                areaVariance[e] = areaVarience(strategies, i);
+                areaVar[e] = areaVariance(strategies, i);
                 trialsPassed[e] = true;
             }
 
@@ -107,8 +107,8 @@ void evaluateConvergence(const string name, vector<SearchStrategy *> strategies,
     cout << "," << endl;
 
     cout << "                \"variance\": ";
-    coutArray(areaVariance, evaluations_size);
-    cout << endl;
+    coutArray(areaVar, evaluations_size);
+    cout << "," << endl;
 
     cout << "                \"endingsizes\": ";
     coutArray(endingSizes, strategies.size());

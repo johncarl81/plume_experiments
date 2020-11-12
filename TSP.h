@@ -9,6 +9,7 @@
 #include <boost/heap/fibonacci_heap.hpp>
 #include "Point.h"
 #include "KDTree.h"
+#include "LineSegment.h"
 #include <iostream>
 
 
@@ -20,7 +21,7 @@ public:
     Edge(Point *first, Point *second) : first(first), second(second) {
         distance = ((*first) - (*second)).length();
     };
-    Edge(Point *first, PointDistance pointDistance) : first(first), second(pointDistance.first) {
+    Edge(Point *first, PointDistance &pointDistance) : first(first), second(pointDistance.first) {
         distance = pointDistance.second;
     };
 
@@ -47,6 +48,8 @@ class TSP {
 public:
 
     static void optimize(vector<Point*> &history);
+
+    static void optimize(vector<LineSegment *> &history);
 
     static void dft(vector<Point*> &result, Point* root, map<Point *, set<Point *>> &map);
 

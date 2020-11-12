@@ -3,7 +3,7 @@
 Ellipse::Ellipse(const Point& center, double x_radius, double y_radius) :
 center(center), radius_x(x_radius), radius_y(y_radius) {}
 
-bool Ellipse::inside(Point vector) {
+bool Ellipse::inside(Point &vector) {
     return pow(((vector.getX() - center.getX()) / radius_x), 2) +
            pow(((vector.getY() - center.getY()) / radius_y), 2) <= 1;
 }
@@ -12,8 +12,9 @@ double Ellipse::size() {
     return _size;
 }
 
-LineSegment Ellipse::segmentIntersections(LineSegment segment) {
-    LineSegment intersectionSegment = intersections(segment.getLine());
+LineSegment Ellipse::segmentIntersections(LineSegment &segment) {
+    Line line = segment.getLine();
+    LineSegment intersectionSegment = intersections(line);
 
     Point start = intersectionSegment.getStart();
     Point end = intersectionSegment.getEnd();
@@ -46,7 +47,7 @@ LineSegment Ellipse::segmentIntersections(LineSegment segment) {
     return LineSegment(segment.getLine(), start, end);
 }
 
-LineSegment Ellipse::intersections(Line line) {
+LineSegment Ellipse::intersections(Line &line) {
     double rx = radius_x * radius_x;
     double ry = radius_y * radius_y;
 

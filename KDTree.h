@@ -47,7 +47,7 @@ private:
 
     static PointDistance nearest(KDNode* parent, Point* point);
 
-    static double getAxisDistance(KDNode *parent, Point *point);
+    static double getAxisDistance(KDNode* parent, Point* point);
 };
 
 

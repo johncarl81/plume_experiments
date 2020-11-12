@@ -61,8 +61,8 @@ void PointStrategy::optimize() {
         }
         samples++;
 
-        distanceEstimate.at(i).distance = distance;
-        distanceEstimate.at(i).estimate = 1.0 * area.size() * hits / samples;
+        distanceEstimate[i].distance = distance;
+        distanceEstimate[i].estimate = 1.0 * area.size() * hits / samples;
     }
 }
 

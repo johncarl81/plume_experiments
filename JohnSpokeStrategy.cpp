@@ -2,7 +2,8 @@
 
 JohnSpokeStrategy::JohnSpokeStrategy(double areaRadius, const Ellipse &area, const Ellipse &region) : areaRadius(areaRadius),
                                                                                               area(area),
-                                                                                              region(region) {}
+                                                                                              region(region),
+                                                                                              previous(Point(0, 0)){}
 
 void JohnSpokeStrategy::execute() {
     double angle = RandomUtil::random_angle();
@@ -13,15 +14,21 @@ void JohnSpokeStrategy::execute() {
 
     LineSegment spoke = LineSegment(line, center, end);
 
-    LineSegment spokeintersection = region.segmentIntersections(spoke);
+    LineSegment spokeIntersection = region.segmentIntersections(spoke);
 
-    withinSpokeLength += spokeintersection.length() * spokeintersection.length() * M_PI;
+    withinSpokeLength += spokeIntersection.length() * spokeIntersection.length() * M_PI;
 
-    distance += 2 * areaRadius;
+    distance += areaRadius;
+    if (!first) {
+        distance += (spoke.getStart() - previous).length();
+    } else {
+        first = false;
+    }
+    previous = spoke.getEnd();
 
     spokes++;
 
-    history.push_back(spoke);
+    history.push_back(new LineSegment(spoke));
     distanceEstimate.emplace_back(distance, withinSpokeLength / spokes);
 }
 
@@ -35,5 +42,41 @@ double JohnSpokeStrategy::getMaxDistance() {
 
 int JohnSpokeStrategy::size() {
     return history.size();
+}
+
+void JohnSpokeStrategy::optimize() {
+    TSP::optimize(history);
+
+    spokes = 0;
+    withinSpokeLength = 0;
+    first = true;
+    distance = 0;
+    for(int i = 0; i < history.size(); i++) {
+
+        LineSegment* spoke = history[i];
+        LineSegment spokeIntersection = region.segmentIntersections(*spoke);
+
+        withinSpokeLength += spokeIntersection.length() * spokeIntersection.length() * M_PI;
+
+        distance += areaRadius;
+        if (!first) {
+            distance += (spoke->getStart() - previous).length();
+        } else {
+            first = false;
+        }
+        previous = spoke->getEnd();
+
+        spokes++;
+
+        distanceEstimate[i].distance = distance;
+        distanceEstimate[i].estimate = withinSpokeLength / spokes;
+    }
+}
+
+JohnSpokeStrategy::~JohnSpokeStrategy() {
+
+    for(LineSegment* edge : history) {
+        delete edge;
+    }
 }
 

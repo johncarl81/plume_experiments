@@ -2,18 +2,27 @@
 
 ChordStrategy::ChordStrategy(double areaRadius, const Ellipse &area, const Ellipse &region) : area(area),
                                                                                               region(region),
-                                                                                              areaRadius(areaRadius) {}
+                                                                                              areaRadius(areaRadius),
+                                                                                              previous(Point(0, 0)){}
 
 void ChordStrategy::execute() {
     LineSegment chord = randomMidpointRadius();
-    LineSegment regionChord = region.intersections(chord.getLine());
+    Line chordLine = chord.getLine();
+    LineSegment regionChord = region.intersections(chordLine);
 
     distance += chord.length();
+    if (!first) {
+        distance += (chord.getStart() - previous).length();
+    } else {
+        first = false;
+    }
+    previous = chord.getEnd();
+
     totalRegionChordLength += regionChord.length();
 
     samples++;
 
-    history.push_back(chord);
+    history.push_back(new LineSegment(chord));
     distanceEstimate.emplace_back(distance, 2 * areaRadius * (totalRegionChordLength / samples));
 }
 
@@ -80,5 +89,40 @@ double ChordStrategy::getMaxDistance() {
 
 int ChordStrategy::size() {
     return history.size();
+}
+
+void ChordStrategy::optimize() {
+    TSP::optimize(history);
+
+    samples = 0;
+    totalRegionChordLength = 0;
+    distance = 0;
+    first = true;
+    for(int i = 0; i < history.size(); i++) {
+        LineSegment* chord = history[i];
+        Line chordLine = chord->getLine();
+        LineSegment regionChord = region.intersections(chordLine);
+
+        distance += chord->length();
+        if (!first) {
+            distance += (chord->getStart() - previous).length();
+        } else {
+            first = false;
+        }
+        previous = chord->getEnd();
+        totalRegionChordLength += regionChord.length();
+
+        samples++;
+
+        distanceEstimate[i].distance = distance;
+        distanceEstimate[i].estimate = 2 * areaRadius * (totalRegionChordLength / samples);
+    }
+}
+
+ChordStrategy::~ChordStrategy() {
+
+    for(LineSegment* edge : history) {
+        delete edge;
+    }
 }
 

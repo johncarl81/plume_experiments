@@ -1,4 +1,5 @@
 #include "TSP.h"
+#include "LineSegment.h"
 
 void TSP::dft(vector<Point*> &result, Point* root, map<Point *, set<Point *>> &map) {
 
@@ -20,6 +21,10 @@ void TSP::dft(vector<Point*> &result, Point* root, map<Point *, set<Point *>> &m
     }
 }
 
+void TSP::optimize(vector<LineSegment *> &history) {
+
+}
+
 void TSP::optimize(vector<Point*> &history) {
 
     if(history.size() < 2) {
@@ -34,14 +39,15 @@ void TSP::optimize(vector<Point*> &history) {
     KDTree nearestTree;
     Point* first = history.back();
     history.pop_back();
-    for(Point* point : history) {
-        nearestTree.insert(point);
+
+    for (auto historyIterator = history.begin() + 1; historyIterator != history.end(); historyIterator++) {
+        nearestTree.insert(*historyIterator);
     }
     included.insert(first);
-    nearestTree.remove(first);
     pushEdge(queue, first, nearestTree, heapHandles);
 
     while(!queue.empty()) {
+//        cout << "Size: " << queue.size() << endl;
         Edge smallestEdge = queue.top();
         queue.pop();
 
@@ -61,13 +67,11 @@ void TSP::optimize(vector<Point*> &history) {
             pushEdge(queue, smallestEdge.first, nearestTree, heapHandles);
             pushEdge(queue, smallestEdge.second, nearestTree, heapHandles);
         } else {
-            PointDistance nearest = nearestTree.nearest(smallestEdge.first);
-            if(nearest.second != INFINITY) {
-                queue.push(Edge(smallestEdge.first, nearest));
-            }
+            pushEdge(queue, smallestEdge.first, nearestTree, heapHandles);
         }
     }
 
+    // Depth first search effectively implements the triangle inequality ordering of the MST.
     dft(history, first, minimumSpanningTree);
 }
 
@@ -75,16 +79,18 @@ void TSP::pushEdge(boost::heap::fibonacci_heap<Edge>& queue, Point* point, KDTre
 
     PointDistance nearest = nearestTree.nearest(point);
     // Only add the new point if it is connected to the current tree with a longer edge.
-    if(map.count(nearest.first) > 0) {
-        boost::heap::fibonacci_heap<Edge>::handle_type handle = map.at(nearest.first);
-        if(handle.node_->value.getDistance() > nearest.second) {
-            // Replace the key if it exists.
-            boost::heap::fibonacci_heap<Edge>::const_reference ref(Edge(point, nearest));
-            queue.decrease(handle, ref);
+    if(nearest.second != INFINITY) {
+        if (map.count(nearest.first) > 0) {
+            boost::heap::fibonacci_heap<Edge>::handle_type handle = map.at(nearest.first);
+            if (handle.node_->value.getDistance() > nearest.second) {
+                // Replace the key if it exists.
+                boost::heap::fibonacci_heap<Edge>::const_reference ref(Edge(point, nearest));
+                queue.decrease(handle, ref);
+            }
+        } else {
+            // Add a new entry because it doesn't exist.
+            boost::heap::fibonacci_heap<Edge>::handle_type handle = queue.push(Edge(point, nearest));
+            map[nearest.first] = handle;
         }
-    } else {
-        // Add a new entry because it doesn't exist.
-        boost::heap::fibonacci_heap<Edge>::handle_type handle = queue.push(Edge(point, nearest));
-        map[nearest.first] = handle;
     }
 }

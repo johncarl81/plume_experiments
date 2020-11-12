@@ -9,13 +9,13 @@ class Ellipse {
 public:
     Ellipse(const Point &center, double x_radius, double y_radius);
 
-    bool inside(Point vector);
+    bool inside(Point &vector);
 
     double size();
 
-    LineSegment segmentIntersections(LineSegment segment);
+    LineSegment segmentIntersections(LineSegment &segment);
 
-    LineSegment intersections(Line line);
+    LineSegment intersections(Line &line);
 
     Point getCenter() {
         return center;

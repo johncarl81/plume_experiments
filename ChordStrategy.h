@@ -5,6 +5,7 @@
 #include "SearchStrategy.h"
 #include "Ellipse.h"
 #include "RandomUtil.h"
+#include "TSP.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ class ChordStrategy: public SearchStrategy {
 public:
     ChordStrategy(double areaRadius, const Ellipse &area, const Ellipse &region);
 
-    ~ChordStrategy() override = default;
+    ~ChordStrategy() override;
 
     void execute() override;
 
@@ -20,7 +21,7 @@ public:
 
     vector<DistanceEstimate>* getDistanceEstimate() override;
 
-    void optimize() override {};
+    void optimize() override;
 
     int size() override;
 
@@ -28,7 +29,7 @@ private:
     Ellipse area, region;
     double areaRadius;
 
-    vector<LineSegment> history;
+    vector<LineSegment*> history;
     vector<DistanceEstimate> distanceEstimate;
 
     LineSegment startEndCircle();
@@ -39,6 +40,8 @@ private:
     double distance = 0;
     double totalRegionChordLength = 0;
     int samples = 0;
+    Point previous;
+    bool first = true;
 
     Point randomPoint();
 };

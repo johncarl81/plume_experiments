@@ -6,14 +6,14 @@ double LineSegment::length() {
     return (end - start).length();
 }
 
-const Line &LineSegment::getLine() const {
+Line LineSegment::getLine() {
     return line;
 }
 
-const Point &LineSegment::getStart() const {
+Point LineSegment::getStart() {
     return start;
 }
 
-const Point &LineSegment::getEnd() const {
+Point LineSegment::getEnd() {
     return end;
 }

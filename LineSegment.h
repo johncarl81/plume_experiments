@@ -11,11 +11,11 @@ public:
 
     double length();
 
-    const Line &getLine() const;
+    Line getLine();
 
-    const Point &getStart() const;
+    Point getStart();
 
-    const Point &getEnd() const;
+    Point getEnd();
 
 private:
     Line line;
