@@ -49,12 +49,13 @@ public:
 
     static void optimize(vector<Point*> &history);
 
-    static void optimize(vector<LineSegment *> &history);
+    static vector<Point*> optimize(vector<LineSegment *> &history);
 
     static void dft(vector<Point*> &result, Point* root, map<Point *, set<Point *>> &map);
 
-    static void
-    pushEdge(boost::heap::fibonacci_heap<Edge>& heap, Point* point, KDTree& tree, map<Point *, boost::heap::fibonacci_heap<Edge>::handle_type>& map);
+    static void pushEdge(boost::heap::fibonacci_heap<Edge>& heap, Point* point, KDTree& tree, map<Point *, boost::heap::fibonacci_heap<Edge>::handle_type>& map);
+
+    static vector<Point*> pathDFS(map<Point *, LineSegment *> &segmentEndpoints, LineSegment *root, map<Point *, set<Point *>> &map);
 };
 
 

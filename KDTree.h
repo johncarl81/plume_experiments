@@ -27,9 +27,26 @@ public:
     bool deactivated = false;
 };
 
+class DistanceCalculation {
+public:
+    virtual double distance(Point &one, Point &two) = 0;
+};
+
+class L2Norm : public DistanceCalculation {
+public:
+    double distance(Point &one, Point &two) override {
+        return (one - two).length();
+    }
+};
+
 class KDTree {
 
 public:
+
+    KDTree(): distanceCalculation(new L2Norm()){};
+
+    KDTree(DistanceCalculation* calculation) : distanceCalculation(calculation) {};
+
     ~KDTree();
 
     void insert(Point* point);
@@ -40,12 +57,13 @@ public:
 
 private:
     KDNode* tree = nullptr;
+    DistanceCalculation* distanceCalculation;
 
     static void insert(KDNode* parent, Point* point);
 
     static void remove(KDNode* parent, Point* point);
 
-    static PointDistance nearest(KDNode* parent, Point* point);
+    PointDistance nearest(KDNode* parent, Point* point);
 
     static double getAxisDistance(KDNode* parent, Point* point);
 };
