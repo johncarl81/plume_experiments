@@ -3,7 +3,7 @@
 Ellipse::Ellipse(const Point& center, double x_radius, double y_radius) :
 center(center), radius_x(x_radius), radius_y(y_radius) {}
 
-bool Ellipse::inside(Point &vector) {
+bool Ellipse::inside(const Point &vector) {
     return pow(((vector.getX() - center.getX()) / radius_x), 2) +
            pow(((vector.getY() - center.getY()) / radius_y), 2) <= 1;
 }
@@ -70,4 +70,36 @@ LineSegment Ellipse::intersections(Line &line) {
     } else {
         return LineSegment(line, Point(0, 0), Point(0, 0));
     }
+}
+
+bool Ellipse::crosses(LineSegment &segment) {
+    Line line = segment.getLine();
+
+    double rx = radius_x * radius_x;
+    double ry = radius_y * radius_y;
+
+    double a = (1 / rx) + (line.getM() * line.getM() / ry);
+    double b = (2 * line.getB() * line.getM() / ry) - (2 * center.getX() / rx) - (2 * center.getY() * line.getM() / ry);
+    double c = (line.getB() * line.getB() / ry) - (2 * line.getB() * center.getY() / ry) + (center.getX() * center.getX() / rx) + (center.getY() * center.getY() / ry) - 1;
+
+    // Solution using Quadratic equation -b +- sqrt(b^2 - 4ac)/2a
+    // where ax^2 + bx + c = 0
+    double discriminant = pow(b,2) - (4 * a * c);
+
+    if (discriminant > 0){
+        double x1 = ((-b) + sqrt(discriminant)) / (2 * a);
+        double x2 = ((-b) - sqrt(discriminant)) / (2 * a);
+
+        double y1 = (line.getM() * x1) + line.getB();
+        double y2 = (line.getM() * x2) + line.getB();
+
+        return (segment.getStart().getX() < x1 && segment.getStart().getX() > x2)
+            || (segment.getEnd().getX() < x1 && segment.getEnd().getX() > x2);
+    } else {
+        return false;
+    }
+}
+
+void Ellipse::print(std::ostream &strm) const {
+    strm << "Ellipse (" << center.getX() << "," << center.getY() << ") " << radius_x << " " << radius_y << std::endl;
 }

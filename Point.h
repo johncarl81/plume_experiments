@@ -13,6 +13,12 @@ public:
 
     Point operator- (Point& first);
 
+    Point operator+= (Point& first);
+
+    Point operator-= (Point& first);
+
+    Point operator-();
+
     double length();
 
     double getX() const;

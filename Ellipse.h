@@ -3,19 +3,22 @@
 
 #include "Point.h"
 #include "LineSegment.h"
+#include "Plume.h"
 
-class Ellipse {
+class Ellipse: public Plume {
 
 public:
     Ellipse(const Point &center, double x_radius, double y_radius);
 
-    bool inside(Point &vector);
+    bool inside(const Point &vector);
 
     double size();
 
     LineSegment segmentIntersections(LineSegment &segment);
 
     LineSegment intersections(Line &line);
+
+    bool crosses(LineSegment &segment);
 
     Point getCenter() {
         return center;
@@ -33,6 +36,8 @@ private:
     Point center;
     double radius_x, radius_y;
     double _size = M_PI * radius_x * radius_y;
+
+    void print(std::ostream &ostream) const override;
 
 };
 

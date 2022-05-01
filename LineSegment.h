@@ -7,6 +7,8 @@
 class LineSegment {
 
 public:
+    LineSegment(Point &start, Point &end);
+
     LineSegment(const Line &line, const Point &start, const Point &end);
 
     LineSegment(const LineSegment& copySegment);
@@ -26,7 +28,7 @@ public:
     Point* getEndPtr();
 
     friend std::ostream& operator<<(std::ostream &strm, const LineSegment &segment) {
-        return strm << "start: " << segment.start << " end: " << segment.end;
+        return strm << "Line " << *segment.start << " " << *segment.end << std::endl;
     }
 
 private:
