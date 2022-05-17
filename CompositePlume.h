@@ -13,6 +13,8 @@ public:
 
     bool inside(const Point &point);
 
+    Point getCross(LineSegment &segment);
+
 private:
     Plume* head;
     Plume* tail;

@@ -90,9 +90,6 @@ bool Ellipse::crosses(LineSegment &segment) {
         double x1 = ((-b) + sqrt(discriminant)) / (2 * a);
         double x2 = ((-b) - sqrt(discriminant)) / (2 * a);
 
-        double y1 = (line.getM() * x1) + line.getB();
-        double y2 = (line.getM() * x2) + line.getB();
-
         return (segment.getStart().getX() < x1 && segment.getStart().getX() > x2)
             || (segment.getEnd().getX() < x1 && segment.getEnd().getX() > x2);
     } else {
@@ -102,4 +99,31 @@ bool Ellipse::crosses(LineSegment &segment) {
 
 void Ellipse::print(std::ostream &strm) const {
     strm << "Ellipse (" << center.getX() << "," << center.getY() << ") " << radius_x << " " << radius_y << std::endl;
+}
+
+Point Ellipse::getCross(LineSegment &segment) {
+    Line line = segment.getLine();
+    LineSegment intersectionSegment = intersections(line);
+
+    Point start = intersectionSegment.getStart();
+    Point end = intersectionSegment.getEnd();
+
+    Point segmentStart = segment.getStart();
+    Point segmentEnd = segment.getEnd();
+
+    if(segmentStart.getX() > segmentEnd.getX()) {
+        Point tmp = segmentStart;
+        segmentStart = segmentEnd;
+        segmentEnd = tmp;
+    }
+
+    std::cout << "start: " << start << " end: " << end << std::endl;
+    std::cout << "segmentStart: " << segmentStart << " segmentEnd: " << segmentEnd << std::endl;
+    if (start.getX() > segmentStart.getX() && start.getX() < segmentEnd.getX()) {
+        return start;
+    }
+    if (end.getX() > segmentStart.getX() && end.getX() < segmentEnd.getX()) {
+        return end;
+    }
+    return Point(0, 0);
 }

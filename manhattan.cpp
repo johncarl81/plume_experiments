@@ -26,6 +26,7 @@ void manhattan(Point& start, Plume& plume) {
     Point travel = Point(TRAVEL_DISTANCE, 0);
     Point current = prev + travel;
     bool encounteredPlume = false;
+    std::cout << "Pen r" << std::endl;
     for(int i = 0; i < 400; i++) {
         LineSegment path = LineSegment(prev, current);
         if(!encounteredPlume && plume.crosses(path)) {

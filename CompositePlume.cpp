@@ -12,3 +12,11 @@ void CompositePlume::print(std::ostream &strm) const {
     head->print(strm);
     tail->print(strm);
 }
+
+Point CompositePlume::getCross(LineSegment &segment) {
+    if(tail->crosses(segment)) {
+        return tail->getCross(segment);
+    } else {
+        return head->getCross(segment);
+    }
+}

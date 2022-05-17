@@ -12,7 +12,9 @@ def main():
     plt.figure()
     ax = plt.gca()
 
-    with open("manhattan_plot.txt", "r") as fp:
+    color = 'k'
+
+    with open("sketch_plot.txt", "r") as fp:
         Lines = fp.readlines()
         for line in Lines:
             split = line.split()
@@ -29,10 +31,12 @@ def main():
                 [startx, starty] = coordinates(split[1])
                 [endx, endy] = coordinates(split[2])
 
-                plt.plot([startx, endx], [starty, endy], 'k-', lw=0.5)
-                plt.arrow((startx + endx) / 2, (starty + endy) / 2, (endx - startx) / 10, (endy - starty) / 20, shape='full', length_includes_head=True, head_width=.01)
+                plt.plot([startx, endx], [starty, endy], color, lw=0.5)
+                plt.arrow((startx + endx) / 2, (starty + endy) / 2, (endx - startx) / 10, (endy - starty) / 20, color=color, shape='full', length_includes_head=True, head_width=.01)
+            elif split[0] == 'Pen':
+                color = split[1]
 
-    pp = PdfPages('manhattan.pdf')
+    pp = PdfPages('sketch.pdf')
     pp.savefig()
     pp.close()
 

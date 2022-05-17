@@ -10,6 +10,8 @@ public:
 
     virtual bool inside(const Point &point) = 0;
 
+    virtual Point getCross(LineSegment &segment) = 0;
+
     friend std::ostream& operator<<(std::ostream &strm, const Plume &plume) {
         plume.print(strm);
         return strm;
