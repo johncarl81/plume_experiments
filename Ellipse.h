@@ -20,6 +20,8 @@ public:
 
     bool crosses(LineSegment &segment);
 
+    bool crossesEdge(LineSegment &segment);
+
     Point getCross(LineSegment &segment) override;
 
     Point getCenter() {

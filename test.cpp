@@ -218,6 +218,55 @@ void testEdgeTSP() {
     cout << "Post Distance: " << distance(path) << " " << path.size() << endl;
 }
 
+void testInfrastructure() {
+    Ellipse ellipse = Ellipse(Point(0, 0), 1, 1);
+
+    Point crossStart = Point(0.5, 0);
+    Point crossEnd = Point(1.5, 0);
+    LineSegment crossingSegment = LineSegment(crossStart, crossEnd);
+
+    Point notCrossStart = Point(1.5, 0);
+    Point notCrossEnd = Point(2.5, 0);
+    LineSegment notCrossingSegment = LineSegment(notCrossStart, notCrossEnd);
+
+    // 1. Cross plume point given a line segment.
+    if(ellipse.crossesEdge(crossingSegment)) {
+        cout << "Crossing success: " << ellipse.getCross(crossingSegment) << endl;;
+    } else {
+        cout << "Should have crossed" << endl;;
+    }
+
+    if(ellipse.crossesEdge(notCrossingSegment)) {
+        cout << "Should not have crossed" << endl;;
+    } else {
+        cout << "Not crossing success." << endl;
+    }
+
+    Point one = Point(0, 0);
+    Point two = Point(1, 0);
+    Point clockwise_three = Point(1, -1);
+    Point counterclockwise_three = Point(1, 1);
+
+    // 2. Clockwise/counterclockwise orientations given three points (cross product)
+    cout << "Clockwise? " << (PointUtil::orientation(one, two, clockwise_three) == PointUtil::CLOCKWISE) << endl;
+    cout << "Counterclockwise? " << (PointUtil::orientation(one, two, counterclockwise_three) == PointUtil::COUNTERCLOCKWISE) << endl;
+
+    // 3. Point movement to a direction with a certain length. (input: angle, length)
+    Point fortyfive = PointUtil::vector(M_PI_4, 1);
+    cout << "45 degrees unitary: " << fortyfive << endl;
+    Point negativefortyfive = PointUtil::vector(-M_PI_4, 1);
+    cout << "-45 degrees unitary: " << negativefortyfive << endl;
+
+    // 4. A vector and an orientation (clock/counter-clock), returns another point a distance of (variable d) perpendicular to the direction of this
+    // vector and on the side of the orientation. We need this for the follower drone to move along the nearest drone.
+    cout << "Perpendicular: " << PointUtil::perpendicular(one, two, 1, PointUtil::CLOCKWISE) << endl;
+    cout << "Perpendicular: " << PointUtil::perpendicular(one, two, 1, PointUtil::COUNTERCLOCKWISE) << endl;
+
+    Point diag = Point(1, 1);
+    cout << "Perpendicular: " << PointUtil::perpendicular(one, diag, 1, PointUtil::CLOCKWISE) << endl;
+    cout << "Perpendicular: " << PointUtil::perpendicular(one, diag, 1, PointUtil::COUNTERCLOCKWISE) << endl;
+}
+
 int main() {
 
     cout << "** KD Tree Tests **" << endl;
@@ -226,6 +275,8 @@ int main() {
     testTSP();
     cout << endl << "** Edge TSP Tests **" << endl;
     testEdgeTSP();
+    cout << endl << "** Sketch infrastructure tests **" << endl;
+    testInfrastructure();
 
     return 0;
 }

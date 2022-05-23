@@ -4,6 +4,10 @@ bool CompositePlume::crosses(LineSegment &segment) {
     return head->crosses(segment) || tail->crosses(segment);
 }
 
+bool CompositePlume::crossesEdge(LineSegment &segment) {
+    return head->crossesEdge(segment) || tail->crossesEdge(segment);
+}
+
 bool CompositePlume::inside(const Point &point) {
     return head->inside(point) || tail->inside(point);
 }
@@ -14,9 +18,9 @@ void CompositePlume::print(std::ostream &strm) const {
 }
 
 Point CompositePlume::getCross(LineSegment &segment) {
-    if(tail->crosses(segment)) {
-        return tail->getCross(segment);
-    } else {
+    if(head->crossesEdge(segment)) {
         return head->getCross(segment);
+    } else {
+        return tail->getCross(segment);
     }
 }

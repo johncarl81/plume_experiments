@@ -11,6 +11,8 @@ public:
 
     bool crosses(LineSegment &segment);
 
+    bool crossesEdge(LineSegment &segment);
+
     bool inside(const Point &point);
 
     Point getCross(LineSegment &segment);

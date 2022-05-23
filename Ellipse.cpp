@@ -101,6 +101,27 @@ void Ellipse::print(std::ostream &strm) const {
     strm << "Ellipse (" << center.getX() << "," << center.getY() << ") " << radius_x << " " << radius_y << std::endl;
 }
 
+bool Ellipse::crossesEdge(LineSegment &segment) {
+    Line line = segment.getLine();
+    LineSegment intersectionSegment = intersections(line);
+
+    Point start = intersectionSegment.getStart();
+    Point end = intersectionSegment.getEnd();
+
+    Point segmentStart = segment.getStart();
+    Point segmentEnd = segment.getEnd();
+
+    if(segmentStart.getX() > segmentEnd.getX()) {
+        Point tmp = segmentStart;
+        segmentStart = segmentEnd;
+        segmentEnd = tmp;
+    }
+
+    return (start.getX() > segmentStart.getX() && start.getX() < segmentEnd.getX()) ||
+            (end.getX() > segmentStart.getX() && end.getX() < segmentEnd.getX());
+}
+
+
 Point Ellipse::getCross(LineSegment &segment) {
     Line line = segment.getLine();
     LineSegment intersectionSegment = intersections(line);
@@ -117,8 +138,6 @@ Point Ellipse::getCross(LineSegment &segment) {
         segmentEnd = tmp;
     }
 
-    std::cout << "start: " << start << " end: " << end << std::endl;
-    std::cout << "segmentStart: " << segmentStart << " segmentEnd: " << segmentEnd << std::endl;
     if (start.getX() > segmentStart.getX() && start.getX() < segmentEnd.getX()) {
         return start;
     }
