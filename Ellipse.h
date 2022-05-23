@@ -24,6 +24,8 @@ public:
 
     Point getCross(LineSegment &segment) override;
 
+    double edgeGradient(Point& point);
+
     Point getCenter() {
         return center;
     }

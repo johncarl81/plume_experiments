@@ -146,3 +146,7 @@ Point Ellipse::getCross(LineSegment &segment) {
     }
     return Point(0, 0);
 }
+
+double Ellipse::edgeGradient(Point& point) {
+    return atan2(-pow(radius_y, 2) * point.getX(), (pow(radius_x, 2) * point.getY()));
+}

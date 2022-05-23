@@ -265,6 +265,15 @@ void testInfrastructure() {
     Point diag = Point(1, 1);
     cout << "Perpendicular: " << PointUtil::perpendicular(one, diag, 1, PointUtil::CLOCKWISE) << endl;
     cout << "Perpendicular: " << PointUtil::perpendicular(one, diag, 1, PointUtil::COUNTERCLOCKWISE) << endl;
+
+    // 8. Gradient class - returns the gradient given a point, either by differentiating, or by implicit function or, by bootstrapping.
+    Point gradientIntersectionStart = Point(0, 0);
+    Point gradientIntersectionEnd = Point(1, 1);
+    LineSegment gradientIntersection = LineSegment(gradientIntersectionStart, gradientIntersectionEnd);
+    Point cross = ellipse.getCross(gradientIntersection);
+    cout << "Intersection " << cross << endl;
+    cout << "Edge gradient: " << ellipse.edgeGradient(cross) << endl;
+
 }
 
 int main() {
