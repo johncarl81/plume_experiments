@@ -11,11 +11,14 @@
 using namespace std;
 
 const int ITER = 10;
+const int CROSSBOUND = 20;
 const double R = 0.5;
-const double epsilon = 0.01;
 const double PI = 3.14159;
-const double INF = 0.05;
-const double DIST = sqrt (2);
+const double DIST = 2;
+
+double epsilon, INF;
+
+vector<double> areas, lengths, angles, eps;
 
 class Point {
 public:
@@ -202,7 +205,7 @@ class Drone {
      //   polytope.push_back (position);
     }
     
-    void MoveDrone (double alpha, double dist, Ellipse &plume)
+    bool MoveDrone (double alpha, double dist, Ellipse &plume)
     {
         Point motion;
         Point nextPosition;
@@ -249,6 +252,14 @@ class Drone {
             polytope.push_back (position);
         if (numCross == 1 && cross)
             polytope.push_back (plume.getCross(dronemotion));
+        
+        if (polytope.size() > 1)
+        {
+            Point currtoinit = polytope.back() - polytope[0];
+            return (currtoinit.length() < INF) && (numCross > CROSSBOUND);
+        }
+        else
+            return false ;
     }
 };
 
@@ -552,7 +563,7 @@ string check (Point P){
     return (((P.x * P.x) / (A * A) + (P.y * P.y) / (B*B))  <= 1) ? "Inside " : "Outside ";
 }
 
-void CrossPlume (Drone &A, Drone &B, double alpha, Ellipse &plume)
+bool CrossPlume (Drone &A, Drone &B, double alpha, Ellipse &plume)
 {
     Point start_pos = A.last;
    // if (abs(start_pos.x) < 2 && abs(start_pos.y) < 2)
@@ -561,9 +572,10 @@ void CrossPlume (Drone &A, Drone &B, double alpha, Ellipse &plume)
     int crossing = A.inside;
     bool orient = true ;
     double alphainitial = alpha;
+    bool endHere = false;
     
     do{
-        A.MoveDrone (alpha, epsilon * epsilon, plume);
+        endHere = endHere || A.MoveDrone (alpha, epsilon * epsilon, plume);
         
         if (PointUtil::orientation(A.last, A.position, start_pos) == PointUtil::CLOCKWISE && alpha > 0)
             orient = false ;
@@ -580,7 +592,7 @@ void CrossPlume (Drone &A, Drone &B, double alpha, Ellipse &plume)
 
     }while (crossing == A.inside && orient);
         
-    if (crossing == A.inside){
+    if (crossing == A.inside && !endHere){
         A.polytope.pop_back ();
         A.position = A.last;
         A.angleTurned -= abs (alphainitial);
@@ -611,15 +623,15 @@ void CrossPlume (Drone &A, Drone &B, double alpha, Ellipse &plume)
      //   cout << "testing cross plume2 ... "<< A.position.x << " " << A.position.y << endl;
      //   cout << "testing cross plume2 ... "<< A.last.x << " " << A.last.y << endl;
 
-        while (crossing == A.inside){
+        while (crossing == A.inside && !endHere){
             d1 = start_pos - A.position;
             if (d1.length() > epsilon * epsilon)
             {
-                A.MoveDrone (0, epsilon*epsilon, plume);
+                endHere = endHere || A.MoveDrone (0, epsilon*epsilon, plume);
              //   B.MoveDrone (0, epsilon*epsilon, plume);
             }
             else{
-                A.MoveDrone (0, d1.length(), plume);
+                endHere = endHere || A.MoveDrone (0, d1.length(), plume);
             //    B.MoveDrone (0, d1.length()/2, plume);
             }
             
@@ -634,7 +646,7 @@ void CrossPlume (Drone &A, Drone &B, double alpha, Ellipse &plume)
         Sync (A,B,alphainitial);
     }
     
-    return ;
+    return endHere;
 }
 
 double estimateArea (vector<Point> polygon)
@@ -650,8 +662,11 @@ double estimateArea (vector<Point> polygon)
     return area ;
 }
 
-int main()
+void sketch_algorithm ()
 {
+    
+    cout << "Running Sketch Algorithm for Epsilon = " << epsilon << endl;
+    
     Point start_a (0.499992,0.00141421);
     Point start_b (0.5,0);
     
@@ -666,6 +681,8 @@ int main()
     Point lineA = A.position - start_a;
     Point lineB = B.position - start_b;
     
+    bool loopEnd = false ;
+    
     do{
         while (A.numCross + B.numCross == 0 || 1 == A.inside + B.inside)
         {
@@ -676,9 +693,9 @@ int main()
             
             if (abs(B.position.x) > 2 || abs(B.position.y) > 2)
                 break ;
-            A.MoveDrone (alpha, epsilon, plume);
+            loopEnd = loopEnd || A.MoveDrone (alpha, epsilon, plume);
          //   Sync (A,B,alpha);
-            B.MoveDrone (alpha, epsilon, plume);
+            loopEnd = loopEnd || B.MoveDrone (alpha, epsilon, plume);
             
         }
         if (A.inside + B.inside != 1)
@@ -686,7 +703,7 @@ int main()
             if (A.inside + B.inside == 0)
             {
                 alpha = epsilon;
-                CrossPlume (A,B, alpha, plume);
+                loopEnd = loopEnd || CrossPlume (A,B, alpha, plume);
                 B.nabla = A.nabla;
 
  //               cout << "testing Sync A... "<< A.position.x << " "<<A.position.y <<" "<<alpha<<" "<<A.nabla<< endl;
@@ -695,7 +712,7 @@ int main()
             else
             {
                 alpha = -epsilon;
-                CrossPlume (B,A, alpha, plume);
+                loopEnd = loopEnd || CrossPlume (B,A, alpha, plume);
                 A.nabla = B.nabla;
 
    //             cout << "testing Sync B... "<< B.position.x << " "<<B.position.y <<" "<<alpha<<" "<<B.nabla<< endl;
@@ -703,19 +720,61 @@ int main()
             }
         }
     //    TOKEN = A.inside + B.inside;
-        lineA = A.polytope.back() - A.polytope[0];
+     //   lineA = A.polytope.back() - A.polytope[0];
      //   lineB = B.polytope.back() - B.polytope[0];
       //  cout << "position and nabla "<<A.position.x << " "<< A.position.y << " "<<A.nabla<< endl;
      //   if (A.polytope.back().x < 2 && A.polytope.back().y < 2 )
     //    cout << "position of polytope "<<A.polytope.back().x << " "<<A.polytope.back().y << endl;
      //   cout << lineA.length() << " distance from origin" << endl;
-    }while (A.numCross < ITER || (abs(lineA.x) > INF || abs(lineA.y) > INF));
+    }while (!loopEnd);
     
     cout <<"Initial crossing with A is " << A.polytope[0].x << " " << A.polytope[0].y << " " <<lineA.length()<< endl;
     cout << "angle turned by A is " << " " << A.angleTurned << endl;
     cout << "distance traversed by A is "<< " " << A.distTraversed << endl;
     cout << "area estimated by A is " << " " << estimateArea (A.polytope) << endl;
+    areas.push_back (estimateArea (A.polytope));
+    lengths.push_back (A.distTraversed);
+    angles.push_back (A.angleTurned);
     cout << "actual area is  " << PI * R * R/2 << endl;
+    
+}
+
+int main()
+{
+    int i = 0;
+    for (epsilon = 0.001; i < 12 ; epsilon += 0.001){
+        INF = 4 * epsilon;
+        if (epsilon == 0.007) continue;
+        sketch_algorithm ();
+        eps.push_back (epsilon);
+        ++i;
+    }
+    
+    cout <<"areas ";
+    for (int i = 0;i < 12; i ++)
+        cout << areas[i] << " ";
+    
+    cout << endl;
+    
+    
+    cout <<"lengths ";
+    for (int i = 0;i < 12; i ++)
+        cout << lengths[i] << " ";
+    
+    cout << endl;
+    
+    
+    cout <<"angles ";
+    for (int i = 0;i < 12; i ++)
+        cout << angles[i] << " ";
+    
+    cout << endl;
+    
+    cout <<"epsilons ";
+    for (int i = 0;i < 12; i ++)
+        cout << eps[i] << " ";
+    
+    cout << endl;
     
     return 0;
 }
