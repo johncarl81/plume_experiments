@@ -24,3 +24,11 @@ Point CompositePlume::getCross(LineSegment &segment) {
         return tail->getCross(segment);
     }
 }
+
+double CompositePlume::edgeGradient(Point& point) {
+    if(head->inside(point)) {
+        return tail->edgeGradient(point);
+    } else {
+        return head->edgeGradient(point);
+    }
+}

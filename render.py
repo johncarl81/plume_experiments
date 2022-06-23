@@ -31,10 +31,17 @@ def main():
                 [startx, starty] = coordinates(split[1])
                 [endx, endy] = coordinates(split[2])
 
-                plt.plot([startx, endx], [starty, endy], color, lw=0.5)
-                plt.arrow((startx + endx) / 2, (starty + endy) / 2, (endx - startx) / 10, (endy - starty) / 20, color=color, shape='full', length_includes_head=True, head_width=.01)
+                if not (startx - endx == 0 and starty - endy == 0):
+                    plt.plot([startx, endx], [starty, endy], color, lw=0.5)
+                    #plt.arrow((startx + endx) / 2, (starty + endy) / 2, (endx - startx) / 10, (endy - starty) / 20, color=color, shape='full', length_includes_head=True, head_width=.001)
+            elif split[0] == 'Point':
+                [x, y] = coordinates(split[1])
+                plt.plot([x], [y], marker="o")
             elif split[0] == 'Pen':
                 color = split[1]
+
+    # ax.set_ylim([-0.1, 0.1])
+    # ax.set_xlim([-0.51, -0.45])
 
     pp = PdfPages('sketch.pdf')
     pp.savefig()

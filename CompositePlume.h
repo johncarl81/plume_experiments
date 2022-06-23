@@ -17,6 +17,8 @@ public:
 
     Point getCross(LineSegment &segment);
 
+    double edgeGradient(Point& point);
+
 private:
     Plume* head;
     Plume* tail;

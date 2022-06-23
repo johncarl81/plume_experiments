@@ -8,9 +8,13 @@ class Plume {
 public:
     virtual bool crosses(LineSegment &segment) = 0;
 
+    virtual bool crossesEdge(LineSegment &segment) = 0;
+
     virtual bool inside(const Point &point) = 0;
 
     virtual Point getCross(LineSegment &segment) = 0;
+
+    virtual double edgeGradient(Point& point) = 0;
 
     friend std::ostream& operator<<(std::ostream &strm, const Plume &plume) {
         plume.print(strm);
