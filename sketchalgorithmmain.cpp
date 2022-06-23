@@ -11,7 +11,7 @@
 using namespace std;
 
 const int ITER = 10;
-const int CROSSBOUND = 20;
+const int CROSSBOUND = 10;
 const double R = 0.5;
 const double PI = 3.14159;
 const double DIST = 2;
@@ -150,7 +150,6 @@ public:
         return radius_y;
     }
     
-private:
     Point center;
     double radius_x, radius_y;
     double _size;
@@ -665,12 +664,17 @@ double estimateArea (vector<Point> polygon)
 void sketch_algorithm ()
 {
     
+    FILE *out = fopen ("sketch_plot.txt", "w");
+    
+    
     cout << "Running Sketch Algorithm for Epsilon = " << epsilon << endl;
     
     Point start_a (0.499992,0.00141421);
     Point start_b (0.5,0);
     
     Ellipse plume (Point (0,0), R, R/2);
+    
+    fprintf (out, "Ellipse (%lf,%lf) %lf %lf ", plume.center.x, plume.center.y, R, R/2);
     
     Drone B (Point (0,0), Point (0,0), 1, 0, false);
     Drone A (Point (0,DIST * epsilon), Point (0, DIST * epsilon), 1, 0, true);
@@ -737,6 +741,16 @@ void sketch_algorithm ()
     angles.push_back (A.angleTurned);
     cout << "actual area is  " << PI * R * R/2 << endl;
     
+    int numPoints = A.polytope.size();
+    
+    cout <<numPoints << endl;
+    
+    for (int i = 0;i < A.polytope.size(); i ++)
+    {
+        fprintf (out, "Line (%lf,%lf) (%lf,%lf)\n", A.polytope[i].x, A.polytope[i].y, A.polytope[(i+1)%numPoints].x, A.polytope[(i+1)%numPoints].y);
+    }
+    
+    
 }
 
 int main()
@@ -751,27 +765,27 @@ int main()
     }
     
     cout <<"areas ";
-    for (int i = 0;i < 12; i ++)
+    for (int i = 0;i < areas.size(); i ++)
         cout << areas[i] << " ";
     
     cout << endl;
     
     
     cout <<"lengths ";
-    for (int i = 0;i < 12; i ++)
+    for (int i = 0;i < lengths.size(); i ++)
         cout << lengths[i] << " ";
     
     cout << endl;
     
     
     cout <<"angles ";
-    for (int i = 0;i < 12; i ++)
+    for (int i = 0;i < angles.size(); i ++)
         cout << angles[i] << " ";
     
     cout << endl;
     
     cout <<"epsilons ";
-    for (int i = 0;i < 12; i ++)
+    for (int i = 0;i < eps.size(); i ++)
         cout << eps[i] << " ";
     
     cout << endl;
