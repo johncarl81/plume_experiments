@@ -589,7 +589,7 @@ bool CrossPlume (Drone &A, Drone &B, double alpha, Ellipse &plume)
   //      cout << "testing cross plume ... "<< A.position.x << " " << A.position.y << endl;
    //     cout << "testing cross plume ... "<< B.position.x << " " << B.position.y << endl;
 
-    }while (crossing == A.inside && orient);
+    }while (crossing == A.inside && orient && !endHere);
         
     if (crossing == A.inside && !endHere){
         A.polytope.pop_back ();
@@ -756,9 +756,9 @@ void sketch_algorithm ()
 int main()
 {
     int i = 0;
-    for (epsilon = 0.001; i < 12 ; epsilon += 0.001){
+    for (epsilon = 0.001; i < 50 ; epsilon += 0.001){
         INF = 4 * epsilon;
-        if (epsilon == 0.007) continue;
+     //   if (epsilon == 0.007) continue;
         sketch_algorithm ();
         eps.push_back (epsilon);
         ++i;
